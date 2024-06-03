@@ -1,3 +1,6 @@
+import Link from 'next/link';
+import { Bars3Icon } from '@heroicons/react/16/solid';
+
 export default function DashboardLayout({
   children, // will be a page or nested layout
 }: {
@@ -6,13 +9,13 @@ export default function DashboardLayout({
   return (
     <div className='drawer md:drawer-open'>
       <input id='my-drawer-2' type='checkbox' className='drawer-toggle' />
-      <div className='drawer-content flex w-full flex-col items-start justify-start p-4'>
+      <div className='drawer-content flex w-full flex-col items-center justify-start p-4 pt-20'>
         {children}
         <label
           htmlFor='my-drawer-2'
-          className='btn btn-primary drawer-button md:hidden'
+          className='btn btn-square drawer-button fixed left-4 top-4 md:hidden'
         >
-          Open drawer
+          <Bars3Icon className='size-4' />
         </label>
       </div>
       <div className='drawer-side'>
@@ -21,10 +24,12 @@ export default function DashboardLayout({
           aria-label='close sidebar'
           className='drawer-overlay'
         ></label>
-        <ul className='menu min-h-full w-80 bg-base-200 p-4 text-base-content'>
+        <ul className='menu menu-lg min-h-full w-80 bg-base-200 p-4 text-base-content'>
           {/* Sidebar content here */}
           <li>
-            <a>List barang</a>
+            <Link href='/dashboard/sku' className='active'>
+              List barang
+            </Link>
           </li>
           <li>
             <a>Barang keluar</a>

@@ -1,33 +1,15 @@
-'use client';
+import Link from 'next/link';
 
 export default function SKUPage() {
-  const addSKU = async () => {
-    await fetch('/dashboard/sku/api', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: 'Test SKU',
-        code: 'test',
-        stock: 100,
-        capitalPrice: 1000,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((err) => console.error(err));
-  };
-
   return (
     <div className='flex w-full flex-col gap-4'>
       <div className='flex justify-between'>
         <button className='btn btn-accent btn-lg'>Scan QR SKU</button>
-        <button className='btn btn-accent btn-lg'>Tambah SKU baru</button>
+        <Link href='/dashboard/sku/add-sku'>
+          <button className='btn btn-accent btn-lg'>Tambah SKU baru</button>
+        </Link>
       </div>
-      <button className='btn btn-circle' onClick={addSKU}>
-        test
-      </button>
+
       <div className='overflow-x-auto '>
         <table className='table'>
           <thead>
