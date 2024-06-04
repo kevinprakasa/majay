@@ -1,6 +1,6 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
-interface SKU extends Document {
+export interface SKU {
   name: string;
   code: string;
   stock: number;
@@ -9,7 +9,9 @@ interface SKU extends Document {
   updatedAt: Date;
 }
 
-const skuSchema: Schema<SKU> = new Schema({
+interface SKUSchema extends SKU, Document {}
+
+const skuSchema: Schema<SKUSchema> = new Schema({
   name: { type: String, required: true },
   code: {
     type: String,
@@ -23,8 +25,8 @@ const skuSchema: Schema<SKU> = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-export const SKU: Model<SKU> =
-  mongoose.models.SKU || mongoose.model<SKU>('SKU', skuSchema);
+export const SKU: Model<SKUSchema> =
+  mongoose.models.SKU || mongoose.model<SKUSchema>('SKU', skuSchema);
 
 // interface Transaction extends Document {
 //   sku: SKU;

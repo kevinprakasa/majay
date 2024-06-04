@@ -1,8 +1,9 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import QRCode from 'qrcode';
 import { generateQRCodeCanvas } from '@/app/helper';
+import { SKUViewModal } from '@/components/SKUViewModal';
+import { SKU } from 'models';
 
 export default function AddSKUPage() {
   const [formState, setFormState] = useState({
@@ -13,7 +14,7 @@ export default function AddSKUPage() {
   });
   const [errorState, setErrorState] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [addedSKU, setAddedSKU] = useState<SKU>();
 
   const { capitalPrice, code, name, stock } = formState;
 
@@ -40,11 +41,9 @@ export default function AddSKUPage() {
       }
       const data = await res.json();
 
-      if (canvasRef.current) {
-        generateQRCodeCanvas(data.code, data.name, canvasRef.current, () => {
-          throw new Error('Error generating QR code');
-        });
-      }
+      setIsLoading(false);
+
+      return data as SKU;
     } catch (error) {
       if (error instanceof Error) {
         setErrorState(error.message);
@@ -128,12 +127,27 @@ export default function AddSKUPage() {
       <button
         className='btn btn-primary btn-lg'
         disabled={!isFormValid()}
-        onClick={addSKU}
+        onClick={() => {
+          addSKU().then(setAddedSKU);
+        }}
       >
         {isLoading && <span className='loading loading-spinner'></span>}
         Buat QR code
       </button>
-      <canvas ref={canvasRef} width='400' height='400'></canvas>
+      <SKUViewModal
+        open={!!addedSKU}
+        sku={addedSKU}
+        onClose={() => setAddedSKU(undefined)}
+        onAddNewSKU={() => {
+          setAddedSKU(undefined);
+          setFormState({
+            name: '',
+            code: '',
+            stock: 0,
+            capitalPrice: 0,
+          });
+        }}
+      />
     </div>
   );
 }
