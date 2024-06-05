@@ -9,6 +9,8 @@ export interface SKU {
   updatedAt: Date;
 }
 
+export type WithId<T> = T & { id: string };
+
 interface SKUSchema extends SKU, Document {}
 
 const skuSchema: Schema<SKUSchema> = new Schema({
@@ -18,6 +20,7 @@ const skuSchema: Schema<SKUSchema> = new Schema({
     required: true,
     unique: true,
     uppercase: true,
+    index: true,
   },
   stock: { type: Number, required: true },
   capitalPrice: { type: Number, required: true },
@@ -25,7 +28,26 @@ const skuSchema: Schema<SKUSchema> = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-export const SKU: Model<SKUSchema> =
+// Adding the transformation function
+skuSchema.set('toJSON', {
+  transform: (doc, ret) => {
+    ret.id = ret._id;
+    delete ret._id;
+    delete ret.__v;
+    return ret;
+  },
+});
+
+skuSchema.set('toObject', {
+  transform: (doc, ret) => {
+    ret.id = ret._id;
+    delete ret._id;
+    delete ret.__v;
+    return ret;
+  },
+});
+
+export const SKUModel: Model<SKUSchema> =
   mongoose.models.SKU || mongoose.model<SKUSchema>('SKU', skuSchema);
 
 // interface Transaction extends Document {

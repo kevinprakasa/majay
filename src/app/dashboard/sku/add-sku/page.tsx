@@ -1,7 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { generateQRCodeCanvas } from '@/app/helper';
+import { useState } from 'react';
 import { SKUViewModal } from '@/components/SKUViewModal';
 import { SKU } from 'models';
 

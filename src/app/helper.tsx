@@ -41,3 +41,18 @@ export const generateQRCodeCanvas = async (
     }
   );
 };
+
+export const priceFormat = (number: number | string): string => {
+  // Convert number to string and add thousand separators
+  const formattedNumber = Number(number).toLocaleString('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  });
+  // Remove currency symbol and replace with 'Rp.'
+  return formattedNumber.replace('IDR', 'Rp.').replace(',00', '');
+};
+
+export const numberFormat = (number: number | string): string => {
+  // Convert number to string and add thousand separators
+  return Number(number).toLocaleString('id-ID');
+};
