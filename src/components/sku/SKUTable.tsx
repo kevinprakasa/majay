@@ -1,10 +1,19 @@
 'use client';
 
 import { numberFormat, priceFormat } from '@/app/helper';
-import { BackwardIcon, ForwardIcon } from '@heroicons/react/16/solid';
-import { useQuery } from '@tanstack/react-query';
+import {
+  BackwardIcon,
+  ForwardIcon,
+  PencilSquareIcon,
+  QrCodeIcon,
+  TrashIcon,
+} from '@heroicons/react/16/solid';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { SKU, WithId } from 'models';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import DeleteModal from './DeleteModal';
+import { SKUViewModal } from '../SKUViewModal';
+import Link from 'next/link';
 
 export default function SKUTable() {
   const [fetchParams, setFetchParams] = useState<
@@ -19,8 +28,12 @@ export default function SKUTable() {
   const { page, limit } = fetchParams;
   const numPage = Number(page || 1);
   const numLimit = Number(limit || 10);
+  const [deleteSku, setDeleteSku] = useState('');
+  const [openedSku, setOpenedSku] = useState<SKU | null>(null);
+  const [editSku, setEditSku] = useState<SKU | null>(null);
+  console.log('🚀 ~ SKUTable ~ openedSku:', openedSku);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ['sku', fetchParams],
     queryFn: async () => {
       const res = await fetch(
@@ -37,11 +50,35 @@ export default function SKUTable() {
       const data = (await res.json()) as { data: WithId<SKU>[]; total: number };
       return data.data;
     },
+    refetchOnMount: 'always',
   });
+
+  useEffect(() => {
+    console.log('USE EFFECT HERE');
+  }, []);
 
   console.log('🚀 ~ SKUTable ~ data:', data);
   return (
     <>
+      <DeleteModal
+        open={!!deleteSku}
+        deletedSkuId={deleteSku}
+        onDeleted={() => {
+          refetch();
+          setDeleteSku('');
+        }}
+        onClose={() => {
+          setDeleteSku('');
+        }}
+      />
+      {openedSku && (
+        <SKUViewModal
+          title='Detail SKU'
+          open={!!openedSku}
+          sku={openedSku}
+          onClose={() => setOpenedSku(null)}
+        />
+      )}
       <div className='overflow-x-auto '>
         <table className='table'>
           <thead>
@@ -64,7 +101,32 @@ export default function SKUTable() {
                   <td>{numberFormat(sku.stock)}</td>
                   <td>{priceFormat(sku.capitalPrice)}</td>
                   <td>
-                    <button className='btn btn-link'>View QR</button>
+                    <div className='flex gap-4'>
+                      <button
+                        className='btn btn-square btn-outline btn-accent'
+                        onClick={() => {
+                          setOpenedSku(sku);
+                        }}
+                      >
+                        <QrCodeIcon width={16} />
+                      </button>
+                      <Link href={`/dashboard/sku/edit/${sku.id}`}>
+                        <button
+                          className='btn btn-square btn-outline btn-accent'
+                          onClick={() => {}}
+                        >
+                          <PencilSquareIcon width={16} />
+                        </button>
+                      </Link>
+                      <button
+                        className='btn btn-square btn-outline btn-accent'
+                        onClick={() => {
+                          setDeleteSku(sku.id);
+                        }}
+                      >
+                        <TrashIcon width={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -81,7 +143,7 @@ export default function SKUTable() {
         </table>
       </div>
 
-      <div className='join flex justify-center'>
+      <div className='join flex  justify-center'>
         <button
           className='btn btn-outline join-item'
           disabled={numPage === 1}

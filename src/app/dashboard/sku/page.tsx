@@ -6,7 +6,7 @@ export default function SKUPage() {
     <div className='flex w-full flex-col gap-4'>
       <div className='flex justify-between'>
         <button className='btn btn-accent btn-lg'>Scan QR SKU</button>
-        <Link href='/dashboard/sku/add-sku'>
+        <Link href='/dashboard/sku/add'>
           <button className='btn btn-accent btn-lg'>Tambah SKU baru</button>
         </Link>
       </div>

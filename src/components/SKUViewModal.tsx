@@ -4,11 +4,12 @@ import { SKU } from 'models';
 import { useEffect, useRef, useState } from 'react';
 
 export const SKUViewModal: React.FC<{
+  title: string;
   open: boolean;
   sku?: SKU;
   onClose: () => void;
-  onAddNewSKU: () => void;
-}> = ({ open, sku, onClose, onAddNewSKU }) => {
+  onAddNewSKU?: () => void;
+}> = ({ open, title, sku, onClose, onAddNewSKU }) => {
   const [errorQR, setErrorQR] = useState('');
   const dialogRef = useRef<HTMLDialogElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -59,7 +60,7 @@ export const SKUViewModal: React.FC<{
             <p className='text-red-500'>{errorQR}</p>
           ) : (
             <div className='flex flex-col items-center'>
-              <p className='text-lg font-bold'>SKU berhasil ditambahkan</p>
+              <p className='text-lg font-bold'>{title}</p>
               <canvas ref={canvasRef} width='400' height='400'></canvas>
               <p>
                 Kode: {code}
@@ -68,15 +69,19 @@ export const SKUViewModal: React.FC<{
                 <br />
                 Harga modal: Rp. {capitalPrice}
               </p>
-              <div className='flex w-full justify-between'>
+              <div
+                className={`flex w-full ${onAddNewSKU ? 'justify-between' : 'justify-around'}`}
+              >
                 <button className='btn btn-primary' onClick={onDownloadQrCode}>
                   <ArrowDownTrayIcon width={16}></ArrowDownTrayIcon>
                   QRCode image
                 </button>
-                <button className='btn btn-accent' onClick={onAddNewSKU}>
-                  <PlusIcon width={16}></PlusIcon>
-                  Tambah SKU lain
-                </button>
+                {onAddNewSKU && (
+                  <button className='btn btn-accent' onClick={onAddNewSKU}>
+                    <PlusIcon width={16}></PlusIcon>
+                    Tambah SKU lain
+                  </button>
+                )}
               </div>
             </div>
           )}

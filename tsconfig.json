@@ -17,6 +17,7 @@
     "jsx": "preserve",
     "incremental": true,
     "baseUrl": ".",
+    "indent": 2,
     "plugins": [
       {
         "name": "next"

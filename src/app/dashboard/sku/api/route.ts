@@ -2,20 +2,6 @@ import dbConnect from 'lib/mongodb';
 import { SKUModel } from 'models';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest) {
-  const data = await request.json();
-  console.log('🚀 ~ POST ~ data:', data);
-  await dbConnect();
-  try {
-    // Validating the data first
-    const sku = new SKUModel(data);
-    const newSku = await sku.save();
-    return Response.json(newSku);
-  } catch (error) {
-    return Response.json(`Error creating SKU: ${error} `, { status: 500 });
-  }
-}
-
 export async function GET(request: NextRequest) {
   try {
     const data = request.nextUrl.searchParams;
@@ -52,5 +38,53 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ data: skus, total: totalSkus });
   } catch (err) {
     return Response.json(`Error fetching SKU: ${err} `, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  const data = await request.json();
+  console.log('🚀 ~ POST ~ data:', data);
+  await dbConnect();
+  try {
+    // Validating the data first
+    const sku = new SKUModel(data);
+    const newSku = await sku.save();
+    return Response.json(newSku);
+  } catch (error) {
+    return Response.json(`Error creating SKU: ${error} `, { status: 500 });
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  const data = await request.json();
+  try {
+    await dbConnect();
+    const { id, ...updateData } = data;
+    const sku = await SKUModel.findById(id);
+    if (!sku) {
+      return Response.json(`SKU not found`, { status: 404 });
+    }
+    sku.set(updateData);
+    const updatedSku = await sku.save();
+    return Response.json(updatedSku);
+  } catch (error) {
+    return Response.json(`Error updating SKU: ${error} `, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const data = await request.json();
+  console.log('🚀 ~ DELETE ~ data:', data);
+  try {
+    await dbConnect();
+    const { id } = data;
+    const sku = await SKUModel.findById(id);
+    if (!sku) {
+      return Response.json(`SKU not found`, { status: 404 });
+    }
+    await sku.deleteOne();
+    return Response.json('SKU deleted');
+  } catch (error) {
+    return Response.json(`Error deleting SKU: ${error} `, { status: 500 });
   }
 }
