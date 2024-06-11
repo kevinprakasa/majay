@@ -1,5 +1,9 @@
 import Link from 'next/link';
-import { Bars3Icon } from '@heroicons/react/16/solid';
+import {
+  Bars3Icon,
+  CurrencyDollarIcon,
+  ListBulletIcon,
+} from '@heroicons/react/16/solid';
 
 export default function DashboardLayout({
   children, // will be a page or nested layout
@@ -28,11 +32,15 @@ export default function DashboardLayout({
           {/* Sidebar content here */}
           <li>
             <Link href='/dashboard/sku' className='active'>
+              <ListBulletIcon width={16} />
               List barang
             </Link>
           </li>
           <li>
-            <a>Barang keluar</a>
+            <a href='/dashboard/record-sales'>
+              <CurrencyDollarIcon width={16} />
+              Input sales
+            </a>
           </li>
         </ul>
       </div>
