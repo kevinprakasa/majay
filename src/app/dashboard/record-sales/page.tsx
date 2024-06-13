@@ -2,6 +2,7 @@
 import { Html5Qrcode } from 'html5-qrcode';
 import { QrCodeIcon } from '@heroicons/react/16/solid';
 import { useEffect, useRef, useState } from 'react';
+import SalesForm from '@/components/record-sales/SalesForm';
 
 export default function RecordSalesPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -24,7 +25,7 @@ export default function RecordSalesPage() {
           console.log('🚀 ~ qrCodeMessage:', qrCodeMessage);
           setScannedCode(qrCodeMessage);
 
-          html5QrCode.stop();
+          html5QrCodeRef.current?.stop();
           modalRef.current?.close();
         },
         (errorMessage) => {
@@ -107,7 +108,8 @@ export default function RecordSalesPage() {
           Scan QR Produk
         </button>
       </div>
-      <div className='divider divider-accent'>Form sales</div>
+      <div className='divider divider-accent'>Input Kode</div>
+      {scannedCode && <SalesForm code={scannedCode} />}
     </>
   );
 }
