@@ -109,7 +109,7 @@ export default function RecordSalesPage() {
         </button>
       </div>
       <div className='divider divider-accent'>Input Kode</div>
-      {scannedCode && <SalesForm code={scannedCode} />}
+      <SalesForm skuCode={scannedCode || ''} />
     </>
   );
 }

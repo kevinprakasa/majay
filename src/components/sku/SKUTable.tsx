@@ -37,7 +37,7 @@ export default function SKUTable() {
     queryKey: ['sku', fetchParams],
     queryFn: async () => {
       const res = await fetch(
-        `/dashboard/sku/api?${new URLSearchParams(fetchParams).toString()}`,
+        `/api/sku?${new URLSearchParams(fetchParams).toString()}`,
         {
           method: 'GET',
         }

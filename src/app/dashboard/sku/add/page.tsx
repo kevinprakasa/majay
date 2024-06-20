@@ -21,7 +21,7 @@ export default function AddSKUPage() {
     setIsLoading(true);
     setErrorState('');
     try {
-      const res = await fetch('/dashboard/sku/api', {
+      const res = await fetch('/api/sku', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -22,7 +22,7 @@ export default function EditSkuPage({ params }: { params: { id: string } }) {
     setIsLoading(true);
     setErrorState('');
     try {
-      const res = await fetch('/dashboard/sku/api', {
+      const res = await fetch('/api/sku', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ export default function EditSkuPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     if (params.id) {
-      fetch(`/dashboard/sku/api?id=${params.id}`)
+      fetch(`/api/sku?id=${params.id}`)
         .then((res) => {
           return res.json() as Promise<{ data: WithId<SKU>[]; total: number }>;
         })
@@ -75,7 +75,7 @@ export default function EditSkuPage({ params }: { params: { id: string } }) {
             name: sku.name,
             code: sku.code,
             stock: sku.stock,
-            capitalPrice: sku.capitalPrice,
+            capitalPrice: Number(sku.capitalPrice),
           });
         });
     }

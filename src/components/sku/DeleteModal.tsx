@@ -20,7 +20,7 @@ export default function DeleteModal({
     error: errorDeleting,
   } = useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/dashboard/sku/api/`, {
+      const res = await fetch(`/api/sku/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
