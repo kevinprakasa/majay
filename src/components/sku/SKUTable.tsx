@@ -8,7 +8,7 @@ import {
   QrCodeIcon,
   TrashIcon,
 } from '@heroicons/react/16/solid';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { SKU, WithId } from 'models';
 import { useEffect, useRef, useState } from 'react';
 import DeleteModal from './DeleteModal';
@@ -72,7 +72,7 @@ export default function SKUTable() {
       />
       {openedSku && (
         <SKUViewModal
-          title='Detail SKU'
+          title='Detail barang'
           open={!!openedSku}
           sku={openedSku}
           onClose={() => setOpenedSku(null)}

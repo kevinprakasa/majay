@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { SKUViewModal } from '@/components/SKUViewModal';
 import { SKU, WithId } from 'models';
 import { useRouter } from 'next/navigation';
 

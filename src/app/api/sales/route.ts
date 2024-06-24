@@ -139,19 +139,19 @@ export async function POST(request: NextRequest) {
 //   }
 // }
 
-// export async function DELETE(request: NextRequest) {
-//   const data = await request.json();
-//   console.log('🚀 ~ DELETE ~ data:', data);
-//   try {
-//     await dbConnect();
-//     const { id } = data;
-//     const sku = await SKUModel.findById(id);
-//     if (!sku) {
-//       return Response.json(`SKU not found`, { status: 404 });
-//     }
-//     await sku.deleteOne();
-//     return Response.json('SKU deleted');
-//   } catch (error) {
-//     return Response.json(`Error deleting SKU: ${error} `, { status: 500 });
-//   }
-// }
+export async function DELETE(request: NextRequest) {
+  const data = await request.json();
+  console.log('🚀 ~ DELETE ~ data:', data);
+  try {
+    await dbConnect();
+    const { id } = data;
+    const sale = await SaleModel.findById(id);
+    if (!sale) {
+      return Response.json(`Sale not found`, { status: 404 });
+    }
+    await sale.deleteOne();
+    return Response.json('Sale is deleted');
+  } catch (error) {
+    return Response.json(`Error deleting SKU: ${error} `, { status: 500 });
+  }
+}

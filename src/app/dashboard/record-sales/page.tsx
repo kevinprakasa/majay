@@ -93,23 +93,39 @@ export default function RecordSalesPage() {
           <button>close</button>
         </form>
       </dialog>
-      <div className='mb-4 flex flex-col items-center justify-around gap-4'>
-        <input
-          type='file'
-          id='qr-input-file'
-          className='file-input file-input-bordered file-input-accent w-full max-w-xs'
-          accept='image/*'
-          capture
-          ref={fileInputRef}
-        ></input>
-        <div className='divider'>OR</div>
-        <button className='btn btn-accent btn-md' onClick={onScanProduct}>
-          <QrCodeIcon width={16} />
-          Scan QR Produk
-        </button>
+      <div className='mb-6 w-full text-left'>
+        <span className='prose'>
+          <h2 className='text-accent'>Input penjualan</h2>
+        </span>
       </div>
-      <div className='divider divider-accent'>Input Kode</div>
-      <SalesForm skuCode={scannedCode || ''} />
+      <div className='flex w-full flex-col items-start'>
+        <div className='mb-4 flex flex-col items-start justify-around gap-4'>
+          <label className='form-control w-full max-w-xs'>
+            <div className='label'>
+              <span className='label-text font-semibold'>
+                Upload QR code barang:
+              </span>
+            </div>
+            <input
+              type='file'
+              id='qr-input-file'
+              placeholder='Upload QR code image'
+              className='file-input file-input-bordered file-input-accent w-full max-w-xs'
+              accept='image/*'
+              capture
+              ref={fileInputRef}
+            ></input>
+          </label>
+
+          <div className='divider'>atau</div>
+          <button className='btn btn-accent btn-md' onClick={onScanProduct}>
+            <QrCodeIcon width={16} />
+            Scan QR barang
+          </button>
+        </div>
+        <div className='divider divider-accent'></div>
+        <SalesForm skuCode={scannedCode || ''} />
+      </div>
     </>
   );
 }

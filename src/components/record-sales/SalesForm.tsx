@@ -97,11 +97,11 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
 
   return (
     <>
-      <div className='prose flex w-[400px] flex-col items-center gap-2 p-2 text-center '>
+      <div className='prose flex w-[400px] flex-col items-start gap-2 p-2 text-center '>
         <h3 className='text-lg text-accent'>Form Penjualan</h3>
         <label className='form-control w-full max-w-xs'>
           <div className='label'>
-            <span className='label-text'>Kode barang:</span>
+            <span className='label-text font-semibold'>Kode barang:</span>
           </div>
 
           <label className='input input-bordered flex items-center gap-2'>
@@ -126,7 +126,7 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
         </label>
         <label className='form-control w-full max-w-xs'>
           <div className='label'>
-            <span className='label-text'>Nama barang:</span>
+            <span className='label-text font-semibold'>Nama barang:</span>
           </div>
           <input
             type='text'
@@ -138,9 +138,11 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
         </label>
         <label className='form-control w-full max-w-xs'>
           <div className='label'>
-            <span className='label-text'>Jumlah barang terjual:</span>
+            <span className='label-text font-semibold'>
+              Jumlah barang terjual:
+            </span>
             {currentSku && (
-              <span className='label-text-alt'>
+              <span className='font-semibold-alt label-text'>
                 Jumlah stok: {numberFormat(currentSku.stock)}
               </span>
             )}
@@ -161,9 +163,9 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
         </label>
         <label className='form-control w-full max-w-xs'>
           <div className='label'>
-            <span className='label-text'>Harga jual:</span>
+            <span className='label-text font-semibold'>Harga jual:</span>
             {currentSku && (
-              <span className='label-text-alt'>
+              <span className='font-semibold-alt label-text'>
                 Harga modal: {priceFormat(currentSku.capitalPrice)}
               </span>
             )}
@@ -210,13 +212,14 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
         </label>
         {error && <p className='m-0 text-error'>{error.message}</p>}
         <button
-          className='btn btn-primary mt-4'
+          className='btn btn-primary mt-4 '
           onClick={() => {
             recordSales();
           }}
         >
           {isPending && <span className='loading loading-spinner'></span>}
-          <PlusIcon width={16} /> Record penjualan
+          <PlusIcon width={16} />
+          Simpan
           {/* TODO: Add alert notify when success */}
         </button>
       </div>

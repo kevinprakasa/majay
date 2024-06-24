@@ -1,6 +1,7 @@
 'use client';
 
 import { numberFormat, priceFormat } from '@/app/helper';
+import DeleteSaleModal from '@/components/sales/DeleteSaleModal';
 import { TrashIcon } from '@heroicons/react/16/solid';
 import { useQuery } from '@tanstack/react-query';
 import { SKU, Sale, WithId } from 'models';
@@ -15,8 +16,13 @@ export default function SalesPage() {
     endDate?: string;
   }>({});
   const [customDate, setCustomDate] = useState<[string, string]>(['', '']);
+  const [deleteSale, setDeleteSale] = useState('');
 
-  const { data: salesData, isLoading } = useQuery<{
+  const {
+    data: salesData,
+    isLoading,
+    refetch,
+  } = useQuery<{
     data: {
       sales: WithId<Sale>[];
       skus: Record<string, SKU>;
@@ -75,14 +81,25 @@ export default function SalesPage() {
 
   return (
     <div className='w-full'>
+      <DeleteSaleModal
+        open={!!deleteSale}
+        deletedId={deleteSale}
+        onDeleted={() => {
+          refetch();
+          setDeleteSale('');
+        }}
+        onClose={() => {
+          setDeleteSale('');
+        }}
+      />
       <span className='prose'>
-        <h2 className='text-accent'>Sales dashboard</h2>
+        <h2 className='text-accent'>Dashboard penjualan</h2>
       </span>
-      <div className='mt-4 flex w-full flex-col gap-4'>
+      <div className='mt-6 flex w-full flex-col gap-4'>
         <div className='flex flex-col gap-4 md:flex-row'>
           <label className='form-control w-full max-w-xs'>
             <div className='label'>
-              <span className='label-text'>Range waktu</span>
+              <span className='label-text font-semibold'>Range waktu</span>
             </div>
             <select
               className='select select-bordered'
@@ -135,7 +152,7 @@ export default function SalesPage() {
         </div>
         <div className='flex justify-between'>
           {fetchParams.startDate && fetchParams.endDate && (
-            <div>
+            <div className='font-semibold'>
               Menampilkan hasil dari{' '}
               {new Date(fetchParams.startDate).toLocaleDateString()} hingga{' '}
               {new Date(fetchParams.endDate).toLocaleDateString()}
@@ -187,7 +204,7 @@ export default function SalesPage() {
                         <button
                           className='btn btn-square btn-outline btn-accent'
                           onClick={() => {
-                            // setDeleteSku(sku.id);
+                            setDeleteSale(sale.id);
                           }}
                         >
                           <TrashIcon width={16} />
@@ -200,11 +217,11 @@ export default function SalesPage() {
                   {totalProfit !== undefined && totalSales !== undefined && (
                     <td colSpan={9} className='text-center'>
                       Total sales:{' '}
-                      <span className='font-bold text-green-700'>
+                      <span className='font-semibold text-green-700'>
                         {priceFormat(totalSales)}
                       </span>{' '}
                       | Total profit:{' '}
-                      <span className='font-bold text-green-700'>
+                      <span className='font-semibold text-green-700'>
                         {priceFormat(totalProfit)}
                       </span>
                     </td>

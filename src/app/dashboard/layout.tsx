@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import {
   Bars3Icon,
+  BuildingStorefrontIcon,
   CurrencyDollarIcon,
   ListBulletIcon,
 } from '@heroicons/react/16/solid';
@@ -39,13 +40,13 @@ export default function DashboardLayout({
           <li>
             <a href='/dashboard/record-sales'>
               <CurrencyDollarIcon width={16} />
-              Input sales
+              Input penjualan
             </a>
           </li>
           <li>
             <a href='/dashboard/sales'>
-              <CurrencyDollarIcon width={16} />
-              Sales
+              <BuildingStorefrontIcon width={16} />
+              Dashboard penjualan
             </a>
           </li>
         </ul>
