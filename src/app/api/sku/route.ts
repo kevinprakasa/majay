@@ -24,10 +24,7 @@ export async function GET(request: NextRequest) {
     await dbConnect();
     // Fetch all SKUs
     const totalSkus = await SKUModel.countDocuments(query);
-    console.log(
-      '🚀 ~ GET ~ (Number(page) - 1) * Number(limit):',
-      (Number(page) - 1) * Number(limit)
-    );
+
     const skus = await SKUModel.find(query, { __v: 0 })
       .sort({
         createdAt: -1,
@@ -43,7 +40,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const data = await request.json();
-  console.log('🚀 ~ POST ~ data:', data);
   await dbConnect();
   try {
     // Validating the data first
@@ -74,7 +70,6 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   const data = await request.json();
-  console.log('🚀 ~ DELETE ~ data:', data);
   try {
     await dbConnect();
     const { id } = data;

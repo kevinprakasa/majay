@@ -15,7 +15,13 @@ import DeleteModal from './DeleteModal';
 import { SKUViewModal } from '../SKUViewModal';
 import Link from 'next/link';
 
-export default function SKUTable() {
+export default function SKUTable({
+  code,
+  setCode,
+}: {
+  code: string;
+  setCode: (code: string) => void;
+}) {
   const [fetchParams, setFetchParams] = useState<
     Partial<{
       id: string;
@@ -24,13 +30,12 @@ export default function SKUTable() {
       page: string;
       limit: string;
     }>
-  >({ limit: '10' });
+  >({ limit: '20' });
   const { page, limit } = fetchParams;
   const numPage = Number(page || 1);
   const numLimit = Number(limit || 10);
   const [deleteSku, setDeleteSku] = useState('');
   const [openedSku, setOpenedSku] = useState<SKU | null>(null);
-  console.log('🚀 ~ SKUTable ~ openedSku:', openedSku);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['sku', fetchParams],
@@ -53,10 +58,9 @@ export default function SKUTable() {
   });
 
   useEffect(() => {
-    console.log('USE EFFECT HERE');
-  }, []);
+    setFetchParams((prev) => ({ ...prev, code }));
+  }, [code]);
 
-  console.log('🚀 ~ SKUTable ~ data:', data);
   return (
     <>
       <DeleteModal
@@ -77,6 +81,19 @@ export default function SKUTable() {
           sku={openedSku}
           onClose={() => setOpenedSku(null)}
         />
+      )}
+      {code && (
+        <div className='flex items-center justify-between'>
+          <div className='text-accent'>Scanned product code: {code}</div>
+          <div className='text-accent'>
+            <button
+              className='btn btn-link btn-active'
+              onClick={() => setCode('')}
+            >
+              Clear code
+            </button>
+          </div>
+        </div>
       )}
       <div className='overflow-x-auto '>
         <table className='table'>

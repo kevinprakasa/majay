@@ -16,7 +16,6 @@ export const generateQRCodeCanvas = async (
       width: 300,
     },
     (error, canvas) => {
-      console.log('🚀 ~ canvas:', canvas);
       if (error) {
         if (onError) onError();
         return;

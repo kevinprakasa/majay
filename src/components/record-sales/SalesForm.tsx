@@ -18,7 +18,6 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
   }>({
     code: '',
   });
-  console.log('🚀 ~ SalesForm ~ formState:', formState);
   const { code, name, priceTotal, priceUnit, quantity, id } = formState;
 
   const { data: skuData } = useQuery({

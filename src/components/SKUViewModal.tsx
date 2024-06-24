@@ -1,4 +1,4 @@
-import { generateQRCodeCanvas, numberFormat } from '@/app/helper';
+import { generateQRCodeCanvas, numberFormat, priceFormat } from '@/app/helper';
 import { ArrowDownTrayIcon, PlusIcon } from '@heroicons/react/16/solid';
 import { SKU } from 'models';
 import { useEffect, useRef, useState } from 'react';
@@ -62,13 +62,23 @@ export const SKUViewModal: React.FC<{
             <div className='flex flex-col items-center gap-2'>
               <p className='text-lg font-bold'>{title}</p>
               <canvas ref={canvasRef} width='400' height='400'></canvas>
-              <p>
-                Kode: {code}
-                <br></br>
-                Jumlah stok: {numberFormat(stock || 0)}
-                <br />
-                Harga modal: Rp. {capitalPrice}
-              </p>
+
+              <table className='table text-center'>
+                <tbody>
+                  <tr>
+                    <th>Kode</th>
+                    <td>{code}</td>
+                  </tr>
+                  <tr>
+                    <th>Jumlah stok</th>
+                    <td>{numberFormat(stock || 0)}</td>
+                  </tr>
+                  <tr>
+                    <th>Harga modal</th>
+                    <td>{priceFormat(capitalPrice || 0)}</td>
+                  </tr>
+                </tbody>
+              </table>
               <div
                 className={`flex w-full ${onAddNewSKU ? 'justify-between' : 'justify-around'}`}
               >

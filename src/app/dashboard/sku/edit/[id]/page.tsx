@@ -67,7 +67,6 @@ export default function EditSkuPage({ params }: { params: { id: string } }) {
           return res.json() as Promise<{ data: WithId<SKU>[]; total: number }>;
         })
         .then(({ data }) => {
-          console.log('🚀 ~ .then ~ data:', data);
           const sku = data[0];
 
           setFormState({

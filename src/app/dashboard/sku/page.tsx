@@ -1,8 +1,13 @@
+'use client';
+
+import QRCodeScanner from '@/components/QRCodeScanner';
 import SKUTable from '@/components/sku/SKUTable';
-import { CameraIcon, PlusIcon } from '@heroicons/react/16/solid';
+import { PlusIcon } from '@heroicons/react/16/solid';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function SKUPage() {
+  const [scannedCode, setScannedCode] = useState<string>('');
   return (
     <>
       <div className='mb-6 w-full text-left'>
@@ -12,10 +17,7 @@ export default function SKUPage() {
       </div>
       <div className='flex w-full flex-col gap-4'>
         <div className='flex justify-between'>
-          <button className='btn btn-accent btn-md'>
-            <CameraIcon width={16} />
-            Scan QR code barang
-          </button>
+          <QRCodeScanner onScanned={setScannedCode} />
           <Link href='/dashboard/sku/add'>
             <button className='btn btn-accent btn-md'>
               <PlusIcon width={16} />
@@ -24,7 +26,7 @@ export default function SKUPage() {
           </Link>
         </div>
 
-        <SKUTable />
+        <SKUTable code={scannedCode} setCode={setScannedCode} />
       </div>
     </>
   );

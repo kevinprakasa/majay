@@ -102,7 +102,6 @@ export async function POST(request: NextRequest) {
       priceTotal: Types.Decimal128.fromString(salesPriceTotal!.toString()),
       quantity,
     });
-    console.log('🚀 ~ POST ~ sale:', sale);
     await sale.save();
 
     sku.stock = updatedStock;
@@ -110,7 +109,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(sale);
   } catch (error) {
-    console.log('🚀 ~ POST ~ error:', error);
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     } else {
@@ -141,7 +139,6 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   const data = await request.json();
-  console.log('🚀 ~ DELETE ~ data:', data);
   try {
     await dbConnect();
     const { id } = data;

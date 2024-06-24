@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import {
   Bars3Icon,
@@ -5,12 +7,15 @@ import {
   CurrencyDollarIcon,
   ListBulletIcon,
 } from '@heroicons/react/16/solid';
+import { usePathname } from 'next/navigation';
 
 export default function DashboardLayout({
   children, // will be a page or nested layout
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   return (
     <div className='drawer md:drawer-open'>
       <input id='my-drawer-2' type='checkbox' className='drawer-toggle' />
@@ -32,19 +37,28 @@ export default function DashboardLayout({
         <ul className='menu menu-lg min-h-full w-80 bg-base-200 p-4 text-base-content'>
           {/* Sidebar content here */}
           <li>
-            <Link href='/dashboard/sku' className='active'>
+            <Link
+              href='/dashboard/sku'
+              className={`${pathname.startsWith('/dashboard/sku') && 'active'}`}
+            >
               <ListBulletIcon width={16} />
               List barang
             </Link>
           </li>
           <li>
-            <a href='/dashboard/record-sales'>
+            <a
+              href='/dashboard/record-sales'
+              className={`${pathname.startsWith('/dashboard/record-sales') && 'active'}`}
+            >
               <CurrencyDollarIcon width={16} />
               Input penjualan
             </a>
           </li>
           <li>
-            <a href='/dashboard/sales'>
+            <a
+              href='/dashboard/sales'
+              className={`${pathname.startsWith('/dashboard/sales') && 'active'}`}
+            >
               <BuildingStorefrontIcon width={16} />
               Dashboard penjualan
             </a>
