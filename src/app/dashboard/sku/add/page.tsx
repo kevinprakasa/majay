@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { SKUViewModal } from '@/components/SKUViewModal';
 import { SKU } from 'models';
+import { PlatformAlert } from '@/components/PlatformAlert';
 
 export default function AddSKUPage() {
   const [formState, setFormState] = useState({
@@ -122,7 +123,9 @@ export default function AddSKUPage() {
           className='input input-bordered w-full max-w-xs uppercase'
         />
       </label>
-      {errorState && <div className='text-error '>{errorState}</div>}
+      {errorState && (
+        <PlatformAlert text={errorState} type='error'></PlatformAlert>
+      )}
       <button
         className='btn btn-primary btn-lg'
         disabled={!isFormValid()}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { SKU, WithId } from 'models';
 import { useRouter } from 'next/navigation';
+import { PlatformAlert } from '@/components/PlatformAlert';
 
 export default function EditSkuPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -145,7 +146,9 @@ export default function EditSkuPage({ params }: { params: { id: string } }) {
           className='input input-bordered w-full max-w-xs uppercase'
         />
       </label>
-      {errorState && <div className='text-error '>{errorState}</div>}
+      {errorState && (
+        <PlatformAlert text={errorState} type='error'></PlatformAlert>
+      )}
       <button
         className='btn btn-primary btn-lg'
         disabled={!isFormValid()}

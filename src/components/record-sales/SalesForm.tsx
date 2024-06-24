@@ -5,6 +5,7 @@ import { PlusIcon } from '@heroicons/react/16/solid';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { SKU, WithId } from 'models';
 import { useEffect, useState } from 'react';
+import { PlatformAlert } from '../PlatformAlert';
 
 export default function SalesForm({ skuCode }: { skuCode: string }) {
   const [skuCodeState, setSkuCodeState] = useState<string>(skuCode);
@@ -20,14 +21,15 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
   });
   const { code, name, priceTotal, priceUnit, quantity, id } = formState;
 
-  const { data: skuData } = useQuery({
+  const { data: skuData, is } = useQuery({
     queryKey: ['sku', skuCodeState],
     queryFn: async () => {
-      if (!skuCodeState) return;
+      if (!skuCodeState) return null;
       const res = await fetch(`/api/sku?code=${skuCodeState}`);
       return await res.json();
     },
   });
+  console.log('🚀 ~ SalesForm ~ skuData:', skuData);
   const currentSku = skuData?.data[0] as WithId<SKU> | undefined;
 
   const handleKeyDown = (e: any) => {
@@ -54,6 +56,7 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
     mutate: recordSales,
     error,
     isPending,
+    isSuccess,
   } = useMutation({
     mutationFn: async () => {
       // Record the sales
@@ -65,10 +68,12 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
         body: JSON.stringify(formState),
       });
       if (!res.ok) {
-        throw new Error(
-          `HTTP error! Status: ${res.status} ${await res.text()} `
-        );
+        throw new Error(`Error reason: ${await res.text()} `);
       }
+    },
+    onSuccess: () => {
+      setFormState({ code: '' });
+      setSkuCodeState('');
     },
   });
 
@@ -209,7 +214,7 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
             total
           </label>
         </label>
-        {error && <p className='m-0 text-error'>{error.message}</p>}
+        {error && <PlatformAlert text={String(error)} type='error' />}
         <button
           className='btn btn-primary mt-4 '
           onClick={() => {
@@ -219,8 +224,10 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
           {isPending && <span className='loading loading-spinner'></span>}
           <PlusIcon width={16} />
           Simpan
-          {/* TODO: Add alert notify when success */}
         </button>
+        {isSuccess && (
+          <PlatformAlert text={'Penjualan telah disimpan'} type='success' />
+        )}
       </div>
     </>
   );

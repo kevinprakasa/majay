@@ -1,47 +1,65 @@
-// 'use client';
+'use client';
 
-// import {
-//   CheckCircleIcon,
-//   ExclamationCircleIcon,
-//   ExclamationTriangleIcon,
-//   InformationCircleIcon,
-// } from '@heroicons/react/24/outline';
-// import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+} from '@heroicons/react/24/outline';
+import { createContext, useContext, useEffect, useState } from 'react';
 
-// export const AlertContext = createContext<{
-//   // alerts: [{ type: string; text: string }];
-//   alert: { type: string; text: string } | null;
-// }>({ alert: null });
+const ALERT_ICON = {
+  info: InformationCircleIcon,
+  warning: ExclamationTriangleIcon,
+  error: ExclamationCircleIcon,
+  success: CheckCircleIcon,
+};
 
-// const ALERT_ICON = {
-//   info: InformationCircleIcon,
-//   warning: ExclamationTriangleIcon,
-//   error: ExclamationCircleIcon,
-//   success: CheckCircleIcon,
-// };
+export const PlatformAlert = ({
+  type = 'info',
+  text = '',
+  duration = 3000,
+}: {
+  type?: 'success' | 'error' | 'warning' | 'info';
+  text: string;
+  duration?: number;
+}) => {
+  const Icon = ALERT_ICON['error'];
+  const [alert, setAlert] = useState<{ type: string; text: string } | null>(
+    null
+  );
+  const [showing, setShowing] = useState(false);
 
-// export const PlatformAlert = ({
-//   type = 'info',
-//   text = '',
-//   duration = 1000,
-// }: {
-//   type?: 'success' | 'error' | 'warning' | 'info';
-//   text: string;
-//   duration?: number;
-// }) => {
-//   const Icon = ALERT_ICON[type];
-//   const { alert } = useContext(AlertContext);
+  useEffect(() => {
+    setAlert({ type, text });
+    setShowing(true);
+    const timer = setTimeout(() => {
+      setAlert(null);
+    }, duration + 1000);
+    const timerShowing = setTimeout(() => {
+      setShowing(false);
+    }, duration);
 
-//   return (
-//     <>
-//       {alert && (
-//         <div className='toast toast-end toast-top'>
-//           <div role='alert' className={`alert alert-${alert.type}`}>
-//             <Icon width={16} />
-//             <span>{alert.text}</span>
-//           </div>
-//         </div>
-//       )}
-//     </>
-//   );
-// };
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(timerShowing);
+    };
+  }, [text, type, duration]);
+
+  return (
+    <>
+      <div
+        className={`toast toast-end toast-top ${!showing && `opacity-0`} transition-all duration-500`}
+      >
+        {alert && (
+          <div role='alert' className={`alert alert-${alert.type} flex`}>
+            <Icon width={22} />
+            <span className='max-w-[130px] text-wrap sm:max-w-full'>
+              {alert.text}
+            </span>
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
