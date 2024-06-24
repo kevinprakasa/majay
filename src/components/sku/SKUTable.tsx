@@ -30,7 +30,6 @@ export default function SKUTable() {
   const numLimit = Number(limit || 10);
   const [deleteSku, setDeleteSku] = useState('');
   const [openedSku, setOpenedSku] = useState<SKU | null>(null);
-  const [editSku, setEditSku] = useState<SKU | null>(null);
   console.log('🚀 ~ SKUTable ~ openedSku:', openedSku);
 
   const { data, isLoading, refetch } = useQuery({

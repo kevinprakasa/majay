@@ -42,6 +42,12 @@ export default function DashboardLayout({
               Input sales
             </a>
           </li>
+          <li>
+            <a href='/dashboard/sales'>
+              <CurrencyDollarIcon width={16} />
+              Sales
+            </a>
+          </li>
         </ul>
       </div>
     </div>

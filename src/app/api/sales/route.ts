@@ -3,44 +3,59 @@ import { SKUModel, SaleModel } from 'models';
 import { Types } from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
-// export async function GET(request: NextRequest) {
-//   try {
-//     const data = request.nextUrl.searchParams;
+export async function GET(request: NextRequest) {
+  try {
+    const data = request.nextUrl.searchParams;
 
-//     const filterData = {
-//       id: data.get('id') || undefined,
-//       name: data.get('name') || undefined,
-//       code: data.get('code') || undefined,
-//       page: Number(data.get('page')) || 1,
-//       limit: Number(data.get('limit')) || 10,
-//     };
-//     const { id, name, code, page, limit } = filterData;
+    const filterData = {
+      startDate: data.get('startDate') || undefined,
+      endDate: data.get('endDate') || undefined,
+      // page: Number(data.get('page')) || 1, // @TODO: Implement pagination
+      // limit: Number(data.get('limit')) || 10,
+    };
+    const { startDate, endDate } = filterData;
 
-//     const query = {
-//       ...(id ? { _id: id } : {}),
-//       ...(name ? { name: { $regex: name, $options: 'i' } } : {}),
-//       ...(code ? { code } : {}),
-//     };
+    const query = {
+      createdAt: {
+        $gte: new Date(startDate || '1970-01-01'),
+        $lte: new Date(endDate || '9999-12-31'),
+      },
+    };
 
-//     await dbConnect();
-//     // Fetch all SKUs
-//     const totalSkus = await SKUModel.countDocuments(query);
-//     console.log(
-//       '🚀 ~ GET ~ (Number(page) - 1) * Number(limit):',
-//       (Number(page) - 1) * Number(limit)
-//     );
-//     const skus = await SKUModel.find(query, { __v: 0 })
-//       .sort({
-//         createdAt: -1,
-//       })
-//       .skip((Number(page) - 1) * Number(limit))
-//       .limit(Number(limit));
+    await dbConnect();
+    // Fetch all SKUs
+    const totalSales = await SaleModel.countDocuments(query);
 
-//     return NextResponse.json({ data: skus, total: totalSkus });
-//   } catch (err) {
-//     return Response.json(`Error fetching SKU: ${err} `, { status: 500 });
-//   }
-// }
+    const sales = await SaleModel.find(query, { __v: 0 }).sort({
+      createdAt: -1,
+    });
+    // .skip((filterData.page - 1) * filterData.limit)
+    // .limit(filterData.limit);
+
+    const skus = await SKUModel.find(
+      {
+        _id: { $in: sales.map((sale) => sale.skuId) },
+      },
+      { __v: 0 }
+    );
+
+    return NextResponse.json({
+      data: {
+        sales,
+        skus: skus.reduce(
+          (acc, sku) => {
+            acc[sku.id] = sku;
+            return acc;
+          },
+          {} as Record<string, unknown>
+        ),
+      },
+      total: totalSales,
+    });
+  } catch (err) {
+    return Response.json(`Error fetching SKU: ${err} `, { status: 500 });
+  }
+}
 
 export async function POST(request: NextRequest) {
   const data = await request.json();
@@ -87,6 +102,7 @@ export async function POST(request: NextRequest) {
       priceTotal: Types.Decimal128.fromString(salesPriceTotal!.toString()),
       quantity,
     });
+    console.log('🚀 ~ POST ~ sale:', sale);
     await sale.save();
 
     sku.stock = updatedStock;

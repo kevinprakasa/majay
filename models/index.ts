@@ -67,17 +67,21 @@ export interface Sale {
   quantity: number;
   priceUnit: string;
   priceTotal: string;
-  saleDate: Date;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const saleSchema = new Schema({
-  skuId: { type: Schema.Types.ObjectId, ref: 'SKU', required: true },
+  skuId: {
+    type: Schema.Types.ObjectId,
+    ref: 'SKU',
+    required: true,
+    index: true,
+  },
   quantity: { type: Number, required: true },
   priceUnit: { type: Types.Decimal128, required: true },
   priceTotal: { type: Types.Decimal128, required: true },
-  createdAt: { type: Date, default: Date.now }, // aka. Sale date
+  createdAt: { type: Date, default: Date.now, index: true }, // aka. Sale date
   updatedAt: { type: Date, default: Date.now },
 });
 
