@@ -96,7 +96,7 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
 
   return (
     <>
-      <div className='prose flex w-[400px] flex-col items-start gap-2 p-2 text-center '>
+      <div className='prose flex w-[400px] flex-col items-center gap-2 p-2 text-center '>
         <h3 className='text-lg text-accent'>Form Penjualan</h3>
         <label className='form-control w-full max-w-xs'>
           <div className='label'>

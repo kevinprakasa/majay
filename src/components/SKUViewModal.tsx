@@ -89,7 +89,7 @@ export const SKUViewModal: React.FC<{
                 {onAddNewSKU && (
                   <button className='btn btn-accent' onClick={onAddNewSKU}>
                     <PlusIcon width={16}></PlusIcon>
-                    Tambah SKU lain
+                    Tambah barang lain
                   </button>
                 )}
               </div>

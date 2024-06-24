@@ -1,6 +1,5 @@
 'use client';
 import { Html5Qrcode } from 'html5-qrcode';
-import { QrCodeIcon } from '@heroicons/react/16/solid';
 import { useEffect, useRef, useState } from 'react';
 import SalesForm from '@/components/record-sales/SalesForm';
 import QRCodeScanner from '@/components/QRCodeScanner';
@@ -49,13 +48,13 @@ export default function RecordSalesPage() {
 
   return (
     <>
-      <div className='mb-6 w-full text-left'>
+      <div className='mb-6 w-full text-center'>
         <span className='prose'>
           <h2 className='text-accent'>Input penjualan</h2>
         </span>
       </div>
-      <div className='flex w-full flex-col items-start'>
-        <div className='mb-4 flex flex-col items-start justify-around gap-4'>
+      <div className='flex w-full flex-col items-center'>
+        <div className='mb-4 flex flex-col items-center justify-around gap-4'>
           <label className='form-control w-full max-w-xs'>
             <div className='label'>
               <span className='label-text font-semibold'>

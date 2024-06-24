@@ -39,6 +39,9 @@ export default function DashboardLayout({
           <li>
             <Link
               href='/dashboard/sku'
+              onClick={() => {
+                document.getElementById('my-drawer-2')?.click();
+              }}
               className={`${pathname.startsWith('/dashboard/sku') && 'active'}`}
             >
               <ListBulletIcon width={16} />
@@ -46,22 +49,30 @@ export default function DashboardLayout({
             </Link>
           </li>
           <li>
-            <a
+            <Link
               href='/dashboard/record-sales'
+              onClick={() => {
+                // close drawer on mobile
+                document.getElementById('my-drawer-2')?.click();
+              }}
               className={`${pathname.startsWith('/dashboard/record-sales') && 'active'}`}
             >
               <CurrencyDollarIcon width={16} />
               Input penjualan
-            </a>
+            </Link>
           </li>
           <li>
-            <a
+            <Link
               href='/dashboard/sales'
+              onClick={() => {
+                // close drawer on mobile
+                document.getElementById('my-drawer-2')?.click();
+              }}
               className={`${pathname.startsWith('/dashboard/sales') && 'active'}`}
             >
               <BuildingStorefrontIcon width={16} />
               Dashboard penjualan
-            </a>
+            </Link>
           </li>
         </ul>
       </div>

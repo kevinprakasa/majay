@@ -4,6 +4,11 @@ const nextConfig = {
     return [
       // Basic redirect
       {
+        source: '/',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
         source: '/dashboard',
         destination: '/dashboard/sku',
         permanent: true,

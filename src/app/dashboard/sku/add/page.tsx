@@ -61,10 +61,10 @@ export default function AddSKUPage() {
 
   return (
     <div className='prose flex w-full flex-col items-center gap-4'>
-      <h2>Tambah SKU baru</h2>
+      <h2 className='text-accent'>Tambah barang baru</h2>
       <label className='form-control w-full max-w-xs'>
         <div className='label'>
-          <span className='label-text'>Nama</span>
+          <span className='label-text font-semibold'>Nama:</span>
         </div>
         <input
           type='text'
@@ -76,7 +76,7 @@ export default function AddSKUPage() {
       </label>
       <label className='form-control w-full max-w-xs'>
         <div className='label'>
-          <span className='label-text'>Total stok</span>
+          <span className='label-text font-semibold'>Jumlah stok:</span>
         </div>
         <input
           type='number'
@@ -91,7 +91,7 @@ export default function AddSKUPage() {
       </label>
       <label className='form-control w-full max-w-xs'>
         <div className='label'>
-          <span className='label-text'>Harga modal</span>
+          <span className='label-text font-semibold'>Harga modal:</span>
         </div>
 
         <label className='input input-bordered flex items-center gap-2'>
@@ -112,7 +112,7 @@ export default function AddSKUPage() {
       </label>
       <label className='form-control w-full max-w-xs'>
         <div className='label'>
-          <span className='label-text'>Kode barang</span>
+          <span className='label-text font-semibold'>Kode barang:</span>
         </div>
         <input
           type='text'

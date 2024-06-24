@@ -81,10 +81,12 @@ export default function EditSkuPage({ params }: { params: { id: string } }) {
 
   return (
     <div className='prose flex w-full flex-col items-center gap-4'>
-      <h2>Ubah SKU</h2>
+      <div className='w-full text-center'>
+        <h2 className='text-accent'>Input penjualan</h2>
+      </div>
       <label className='form-control w-full max-w-xs'>
         <div className='label'>
-          <span className='label-text'>Nama</span>
+          <span className='label-text font-semibold'>Nama:</span>
         </div>
         <input
           type='text'
@@ -97,7 +99,7 @@ export default function EditSkuPage({ params }: { params: { id: string } }) {
       </label>
       <label className='form-control w-full max-w-xs'>
         <div className='label'>
-          <span className='label-text'>Total stok</span>
+          <span className='label-text font-semibold'>Jumlah stok:</span>
         </div>
         <input
           type='number'
@@ -112,7 +114,7 @@ export default function EditSkuPage({ params }: { params: { id: string } }) {
       </label>
       <label className='form-control w-full max-w-xs'>
         <div className='label'>
-          <span className='label-text'>Harga modal</span>
+          <span className='label-text font-semibold'>Harga modal:</span>
         </div>
 
         <label className='input input-bordered flex items-center gap-2'>
@@ -133,7 +135,7 @@ export default function EditSkuPage({ params }: { params: { id: string } }) {
       </label>
       <label className='form-control w-full max-w-xs'>
         <div className='label'>
-          <span className='label-text'>Kode barang</span>
+          <span className='label-text font-semibold'>Kode barang:</span>
         </div>
         <input
           type='text'
@@ -154,7 +156,7 @@ export default function EditSkuPage({ params }: { params: { id: string } }) {
         }}
       >
         {isLoading && <span className='loading loading-spinner'></span>}
-        Ubah SKU
+        Simpan
       </button>
     </div>
   );
