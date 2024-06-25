@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ReactQueryClientProvider } from '@/components/ReactQueryClientProvider';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,7 +28,10 @@ export default function RootLayout({
   return (
     <html lang='en' data-theme='light'>
       <ReactQueryClientProvider>
-        <body className={`${inter.className}`}>{children}</body>
+        <body className={`${inter.className}`}>
+          {children}
+          <SpeedInsights />
+        </body>
       </ReactQueryClientProvider>
     </html>
   );
