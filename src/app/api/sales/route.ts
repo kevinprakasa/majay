@@ -96,10 +96,13 @@ export async function POST(request: NextRequest) {
       throw new Error('Stock not sufficient');
     }
 
+    const profit = salesPriceTotal! - Number(sku.capitalPrice) * quantity;
+
     const sale = new SaleModel({
       skuId: new Types.ObjectId(id),
       priceUnit: Types.Decimal128.fromString(salesPriceUnit!.toString()),
       priceTotal: Types.Decimal128.fromString(salesPriceTotal!.toString()),
+      profit: Types.Decimal128.fromString(profit.toString()),
       quantity,
     });
     await sale.save();

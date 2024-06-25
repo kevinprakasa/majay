@@ -29,7 +29,6 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
       return await res.json();
     },
   });
-  console.log('🚀 ~ SalesForm ~ skuData:', skuData);
   const currentSku = skuData?.data[0] as WithId<SKU> | undefined;
 
   const handleKeyDown = (e: any) => {
@@ -124,7 +123,7 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
               className='tooltip'
               data-tip='Tekan enter untuk input kode secara manual'
             >
-              <kbd className='kbd kbd-sm text-white'>&crarr;</kbd>
+              <kbd className='kbd kbd-sm '>&crarr;</kbd>
             </div>
           </label>
         </label>

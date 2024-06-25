@@ -30,7 +30,7 @@ export default function RecordSalesPage() {
             },
             (err) => {
               // failure, handle it.
-              console.log(`Error scanning file. Reason: ${err}`);
+              console.warn(`Error scanning file. Reason: ${err}`);
             }
           );
         }

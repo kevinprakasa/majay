@@ -67,6 +67,7 @@ export interface Sale {
   quantity: number;
   priceUnit: string;
   priceTotal: string;
+  profit: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -81,6 +82,7 @@ const saleSchema = new Schema({
   quantity: { type: Number, required: true },
   priceUnit: { type: Types.Decimal128, required: true },
   priceTotal: { type: Types.Decimal128, required: true },
+  profit: { type: Types.Decimal128, required: true },
   createdAt: { type: Date, default: Date.now, index: true }, // aka. Sale date
   updatedAt: { type: Date, default: Date.now },
 });
@@ -90,6 +92,7 @@ saleSchema.set('toJSON', {
     ret.id = ret._id;
     ret.priceUnit = ret.priceUnit.toString();
     ret.priceTotal = ret.priceTotal.toString();
+    ret.profit = ret.profit.toString();
     delete ret._id;
     delete ret.__v;
     return ret;
@@ -101,6 +104,7 @@ saleSchema.set('toObject', {
     ret.id = ret._id;
     ret.priceUnit = ret.priceUnit.toString();
     ret.priceTotal = ret.priceTotal.toString();
+    ret.profit = ret.profit.toString();
     delete ret._id;
     delete ret.__v;
     return ret;

@@ -51,11 +51,7 @@ export default function SalesPage() {
   const { data, total } = salesData || {};
   const { skus, sales } = data || {};
   const totalProfit = sales?.reduce((acc, sale) => {
-    if (skus === undefined || !skus[sale.skuId]) return acc;
-    const sku = skus[sale.skuId];
-    const profit =
-      sale.quantity * (Number(sale.priceUnit) - Number(sku.capitalPrice));
-    return acc + profit;
+    return acc + Number(sale.profit);
   }, 0);
   const totalSales = sales?.reduce((acc, sale) => {
     return acc + Number(sale.priceTotal);
@@ -183,9 +179,7 @@ export default function SalesPage() {
                 {sales?.map((sale, index) => {
                   if (skus === undefined || !skus[sale.skuId]) return null;
                   const sku = skus[sale.skuId];
-                  const profit =
-                    sale.quantity *
-                    (Number(sale.priceUnit) - Number(sku.capitalPrice));
+                  const profit = Number(sale.profit);
                   return (
                     <tr key={sale.id}>
                       <th>{index + 1}</th>

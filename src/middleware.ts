@@ -16,9 +16,11 @@ export function middleware(request: NextRequest) {
     'ascii'
   );
   const [username, password] = credentials.split(':');
+  const BASIC_AUTH_USERNAME = process.env.BASIC_AUTH_USERNAME!;
+  const BASIC_AUTH_PASSWORD = process.env.BASIC_AUTH_PASSWORD!;
 
   // Check if the credentials are valid
-  if (username === 'admin' && password === 'password') {
+  if (username === BASIC_AUTH_USERNAME && password === BASIC_AUTH_PASSWORD) {
     return NextResponse.next();
   } else {
     return new Response('Unauthorized', { status: 401 });

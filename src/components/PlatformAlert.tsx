@@ -6,7 +6,7 @@ import {
   ExclamationTriangleIcon,
   InformationCircleIcon,
 } from '@heroicons/react/24/outline';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const ALERT_ICON = {
   info: InformationCircleIcon,
@@ -16,11 +16,11 @@ const ALERT_ICON = {
 };
 
 export const PlatformAlert = ({
-  type = 'info',
+  type,
   text = '',
   duration = 3000,
 }: {
-  type?: 'success' | 'error' | 'warning' | 'info';
+  type: 'success' | 'error' | 'warning' | 'info';
   text: string;
   duration?: number;
 }) => {
@@ -31,8 +31,10 @@ export const PlatformAlert = ({
   const [showing, setShowing] = useState(false);
 
   useEffect(() => {
-    setAlert({ type, text });
-    setShowing(true);
+    if (text && type) {
+      setAlert({ type, text });
+      setShowing(true);
+    }
     const timer = setTimeout(() => {
       setAlert(null);
     }, duration + 1000);
