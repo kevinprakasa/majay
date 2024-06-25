@@ -18,16 +18,17 @@ const ALERT_ICON = {
 export const PlatformAlert = ({
   type,
   text = '',
-  duration = 3000,
+  duration = 5000,
 }: {
   type: 'success' | 'error' | 'warning' | 'info';
   text: string;
   duration?: number;
 }) => {
   const Icon = ALERT_ICON['error'];
-  const [alert, setAlert] = useState<{ type: string; text: string } | null>(
-    null
-  );
+  const [alert, setAlert] = useState<{ type: string; text: string }>({
+    text: '',
+    type: 'info',
+  });
   const [showing, setShowing] = useState(false);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export const PlatformAlert = ({
       setShowing(true);
     }
     const timer = setTimeout(() => {
-      setAlert(null);
+      setAlert({ type: 'info', text: '' });
     }, duration + 1000);
     const timerShowing = setTimeout(() => {
       setShowing(false);
@@ -53,14 +54,12 @@ export const PlatformAlert = ({
       <div
         className={`toast toast-end toast-top ${!showing && `opacity-0`} transition-all duration-500`}
       >
-        {alert && (
-          <div role='alert' className={`alert alert-${alert.type} flex`}>
-            <Icon width={22} />
-            <span className='max-w-[130px] text-wrap sm:max-w-full'>
-              {alert.text}
-            </span>
-          </div>
-        )}
+        <div role='alert' className={`alert alert-${alert.type} flex`}>
+          <Icon width={22} />
+          <span className='max-w-[130px] text-wrap sm:max-w-full'>
+            {alert.text}
+          </span>
+        </div>
       </div>
     </>
   );

@@ -80,7 +80,7 @@ export const SKUViewModal: React.FC<{
                 </tbody>
               </table>
               <div
-                className={`flex w-full ${onAddNewSKU ? 'justify-between' : 'justify-around'}`}
+                className={`flex w-full gap-2 ${onAddNewSKU ? 'justify-between' : 'justify-around'}`}
               >
                 <button className='btn btn-primary' onClick={onDownloadQrCode}>
                   <ArrowDownTrayIcon width={16}></ArrowDownTrayIcon>

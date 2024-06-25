@@ -1,5 +1,6 @@
 import dbConnect from 'lib/mongodb';
 import { SKUModel } from 'models';
+import { Error } from 'mongoose';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -47,6 +48,10 @@ export async function POST(request: NextRequest) {
     const newSku = await sku.save();
     return Response.json(newSku);
   } catch (error) {
+    // @ts-ignore
+    if (error?.code === 11000) {
+      return Response.json(`SKU already exists`, { status: 400 });
+    }
     return Response.json(`Error creating SKU: ${error} `, { status: 500 });
   }
 }

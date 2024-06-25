@@ -137,7 +137,7 @@ export default function AddSKUPage() {
         Buat QR code
       </button>
       <SKUViewModal
-        title={'SKU Berhasil ditambahkan'}
+        title={'Barang berhasil ditambahkan'}
         open={!!addedSKU}
         sku={addedSKU}
         onClose={() => setAddedSKU(undefined)}
