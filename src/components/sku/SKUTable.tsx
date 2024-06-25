@@ -22,6 +22,10 @@ export default function SKUTable({
   code: string;
   setCode: (code: string) => void;
 }) {
+  const [filterState, setFilterState] = useState({
+    name: '',
+    code: '',
+  });
   const [fetchParams, setFetchParams] = useState<
     Partial<{
       id: string;
@@ -57,7 +61,15 @@ export default function SKUTable({
     refetchOnMount: 'always',
   });
 
+  const onFilter = () => {
+    setFetchParams((prev) => ({
+      ...prev,
+      ...filterState,
+    }));
+  };
+
   useEffect(() => {
+    setFilterState((prev) => ({ ...prev, code }));
     setFetchParams((prev) => ({ ...prev, code }));
   }, [code]);
 
@@ -82,7 +94,8 @@ export default function SKUTable({
           onClose={() => setOpenedSku(null)}
         />
       )}
-      {code && (
+      <div className='divider'></div>
+      {/* {code && (
         <div className='flex items-center justify-between'>
           <div className='text-accent'>Scanned product code: {code}</div>
           <div className='text-accent'>
@@ -94,7 +107,62 @@ export default function SKUTable({
             </button>
           </div>
         </div>
-      )}
+      )} */}
+      <div className='flex items-end gap-4'>
+        <label className='form-control w-full max-w-xs'>
+          <div className='label'>
+            <span className='label-text font-semibold'>Cari dengan nama:</span>
+          </div>
+          <input
+            type='text'
+            placeholder='Type here'
+            className='input input-bordered w-full max-w-xs'
+            value={filterState.name}
+            onChange={(e) => {
+              setFilterState((prev) => ({
+                ...prev,
+                name: e.target.value,
+              }));
+            }}
+          />
+        </label>
+        <label className='form-control w-full max-w-xs'>
+          <div className='label'>
+            <span className='label-text font-semibold'>Cari dengan kode:</span>
+          </div>
+          <input
+            type='text'
+            placeholder='Type here'
+            value={filterState.code}
+            className='input input-bordered w-full max-w-xs'
+            onChange={(e) => {
+              setFilterState((prev) => ({
+                ...prev,
+                code: e.target.value,
+              }));
+            }}
+          />
+        </label>
+        <button className='btn btn-primary' onClick={onFilter}>
+          Filter
+        </button>
+        {(fetchParams.name || fetchParams.code) && (
+          <button
+            className='btn btn-link'
+            onClick={() => {
+              setFilterState({
+                name: '',
+                code: '',
+              });
+              setFetchParams({
+                limit: '20',
+              });
+            }}
+          >
+            Clear filter
+          </button>
+        )}
+      </div>
       <div className='overflow-x-auto '>
         <table className='table'>
           <thead>

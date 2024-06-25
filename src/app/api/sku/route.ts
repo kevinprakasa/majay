@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const query = {
       ...(id ? { _id: id } : {}),
       ...(name ? { name: { $regex: name, $options: 'i' } } : {}),
-      ...(code ? { code } : {}),
+      ...(code ? { code: { $regex: code, $options: 'i' } } : {}),
     };
 
     await dbConnect();
