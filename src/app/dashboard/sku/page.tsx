@@ -16,7 +16,7 @@ export default function SKUPage() {
         </span>
       </div>
       <div className='flex w-full flex-col gap-4'>
-        <div className='flex justify-between'>
+        <div className='flex flex-col items-baseline justify-between gap-4 sm:flex-row'>
           <QRCodeScanner onScanned={setScannedCode} />
           <Link href='/dashboard/sku/add'>
             <button className='btn btn-accent btn-md'>
