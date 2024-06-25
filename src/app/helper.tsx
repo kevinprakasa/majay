@@ -15,6 +15,7 @@ export const generateQRCodeCanvas = async (
       margin: 4,
       width: 300,
     },
+    // @ts-ignore
     (error, canvas) => {
       if (error) {
         if (onError) onError();
