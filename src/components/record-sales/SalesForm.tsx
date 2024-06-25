@@ -21,7 +21,7 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
   });
   const { code, name, priceTotal, priceUnit, quantity, id } = formState;
 
-  const { data: skuData, is } = useQuery({
+  const { data: skuData } = useQuery({
     queryKey: ['sku', skuCodeState],
     queryFn: async () => {
       if (!skuCodeState) return null;
