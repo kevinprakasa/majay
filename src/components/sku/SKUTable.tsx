@@ -41,7 +41,11 @@ export default function SKUTable({
   const [deleteSku, setDeleteSku] = useState('');
   const [openedSku, setOpenedSku] = useState<SKU | null>(null);
 
-  const { data, isLoading, refetch } = useQuery({
+  const {
+    data = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['sku', fetchParams],
     queryFn: async () => {
       const res = await fetch(
@@ -95,19 +99,6 @@ export default function SKUTable({
         />
       )}
       <div className='divider'></div>
-      {/* {code && (
-        <div className='flex items-center justify-between'>
-          <div className='text-accent'>Scanned product code: {code}</div>
-          <div className='text-accent'>
-            <button
-              className='btn btn-link btn-active'
-              onClick={() => setCode('')}
-            >
-              Clear code
-            </button>
-          </div>
-        </div>
-      )} */}
       <div className='flex items-end gap-4'>
         <label className='form-control w-full max-w-xs'>
           <div className='label'>
@@ -176,44 +167,50 @@ export default function SKUTable({
             </tr>
           </thead>
           <tbody>
-            {data &&
-              data.map((sku, index) => (
-                <tr key={sku.id}>
-                  <td>{(numPage - 1) * numLimit + index + 1}</td>
-                  <td>{sku.name}</td>
-                  <td>{sku.code}</td>
-                  <td>{numberFormat(sku.stock)}</td>
-                  <td>{priceFormat(sku.capitalPrice)}</td>
-                  <td>
-                    <div className='flex gap-4'>
+            {data.map((sku, index) => (
+              <tr key={sku.id}>
+                <td>{(numPage - 1) * numLimit + index + 1}</td>
+                <td>{sku.name}</td>
+                <td>{sku.code}</td>
+                <td>{numberFormat(sku.stock)}</td>
+                <td>{priceFormat(sku.capitalPrice)}</td>
+                <td>
+                  <div className='flex gap-4'>
+                    <button
+                      className='btn btn-square btn-outline btn-accent'
+                      onClick={() => {
+                        setOpenedSku(sku);
+                      }}
+                    >
+                      <QrCodeIcon width={16} />
+                    </button>
+                    <Link href={`/dashboard/sku/edit/${sku.id}`}>
                       <button
                         className='btn btn-square btn-outline btn-accent'
-                        onClick={() => {
-                          setOpenedSku(sku);
-                        }}
+                        onClick={() => {}}
                       >
-                        <QrCodeIcon width={16} />
+                        <PencilSquareIcon width={16} />
                       </button>
-                      <Link href={`/dashboard/sku/edit/${sku.id}`}>
-                        <button
-                          className='btn btn-square btn-outline btn-accent'
-                          onClick={() => {}}
-                        >
-                          <PencilSquareIcon width={16} />
-                        </button>
-                      </Link>
-                      <button
-                        className='btn btn-square btn-outline btn-accent'
-                        onClick={() => {
-                          setDeleteSku(sku.id);
-                        }}
-                      >
-                        <TrashIcon width={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </Link>
+                    <button
+                      className='btn btn-square btn-outline btn-accent'
+                      onClick={() => {
+                        setDeleteSku(sku.id);
+                      }}
+                    >
+                      <TrashIcon width={16} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {data.length === 0 && !isLoading && (
+              <tr>
+                <td colSpan={6} className='text-center'>
+                  No data found
+                </td>
+              </tr>
+            )}
             {isLoading && (
               <tr>
                 <td colSpan={6}>

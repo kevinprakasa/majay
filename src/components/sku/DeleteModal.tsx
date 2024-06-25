@@ -52,9 +52,9 @@ export default function DeleteModal({
   return (
     <dialog ref={deleteModalRef} onClose={onClose} className='modal'>
       <div className='modal-box'>
-        <h3 className='text-lg font-bold'>Menghapus SKU ini</h3>
+        <h3 className='text-lg font-bold'>Menghapus barang ini</h3>
         <p className='py-4'>
-          Apakah Anda yakin ingin menghapus SKU ini? Tindakan ini tidak dapat
+          Apakah Anda yakin ingin menghapus barang ini? Tindakan ini tidak dapat
           dibatalkan.
         </p>
         <div className='modal-action'>

@@ -207,6 +207,13 @@ export default function SalesPage() {
                     </tr>
                   );
                 })}
+                {sales?.length === 0 && (
+                  <tr>
+                    <td colSpan={9} className='text-center'>
+                      No data found
+                    </td>
+                  </tr>
+                )}
                 <tr>
                   {totalProfit !== undefined && totalSales !== undefined && (
                     <td colSpan={9} className='text-center'>
