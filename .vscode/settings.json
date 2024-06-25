@@ -1,8 +1,8 @@
 {
-    "editor.tabSize": 2,
-    "editor.detectIndentation": true,
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit"
-    },
-    "typescript.tsdk": "node_modules/typescript/lib"
+  "editor.tabSize": 2,
+  "editor.detectIndentation": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
