@@ -58,7 +58,7 @@ export default function DashboardLayout({
               className={`${pathname.startsWith('/dashboard/record-sales') && 'active'}`}
             >
               <CurrencyDollarIcon width={16} />
-              Input penjualan
+              Input Penjualan
             </Link>
           </li>
           <li>
