@@ -103,7 +103,7 @@ export default function QRCodeScanner({
         html5QrCodeRef.current.stop().catch(console.warn);
       }
     };
-  }, []);
+  }, [isScanning]);
 
   return (
     <>
