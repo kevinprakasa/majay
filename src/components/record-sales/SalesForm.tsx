@@ -14,6 +14,11 @@ import { useEffect, useState } from 'react';
 import { PlatformAlert } from '../PlatformAlert';
 import QRCodeScanner from '../QRCodeScanner';
 import ReceiptModal from './ReceiptModal';
+import {
+  printerService,
+  ReceiptData,
+  ReceiptItem,
+} from '@/services/printerService';
 
 type FormItem = {
   code: string;
@@ -29,6 +34,8 @@ export default function SalesForm() {
   const [formItems, setFormItems] = useState<FormItem[]>([{ code: '' }]);
   const [loadedSkus, setLoadedSkus] = useState<WithId<SKU>[]>([]);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [receiptData, setReceiptData] = useState<ReceiptData | undefined>();
+  const [printError, setPrintError] = useState<string | null>(null);
 
   const { data: skuData } = useQuery({
     queryKey: ['sku', skuCodeState[skuCodeState.length - 1]],
@@ -114,6 +121,29 @@ export default function SalesForm() {
       }
     },
     onSuccess: () => {
+      // Prepare receipt data before clearing form items
+      const receiptItems: ReceiptItem[] = formItems
+        .filter((item) => item.id && item.name)
+        .map((item) => ({
+          name: item.name!,
+          code: item.code,
+          quantity: item.quantity!,
+          priceUnit: item.priceUnit!,
+          priceTotal: item.priceTotal!,
+        }));
+
+      const totalAmount = receiptItems.reduce(
+        (sum, item) => sum + item.priceTotal,
+        0
+      );
+
+      setReceiptData({
+        items: receiptItems,
+        totalAmount,
+        date: new Date(),
+        receiptNumber: `TXN-${Date.now().toString().slice(-8)}`,
+      });
+
       setShowReceiptModal(true);
       setFormItems([{ code: '' }]);
       setSkuCodeState(['']);
@@ -141,18 +171,34 @@ export default function SalesForm() {
 
   const handleCloseModal = () => {
     setShowReceiptModal(false);
+    setReceiptData(undefined);
+    setPrintError(null);
   };
 
-  const handlePrintReceipt = () => {
-    // TODO: Implement receipt printing logic
-    console.log('Print receipt functionality will be implemented here');
-    setShowReceiptModal(false);
+  const handlePrintReceipt = async () => {
+    if (!receiptData) {
+      setPrintError('No receipt data available');
+      return;
+    }
+
+    try {
+      setPrintError(null);
+      await printerService.printReceipt(receiptData);
+      setShowReceiptModal(false);
+      setReceiptData(undefined);
+    } catch (error) {
+      console.error('Print error:', error);
+      setPrintError(
+        error instanceof Error ? error.message : 'Failed to print receipt'
+      );
+    }
   };
 
   return (
     <>
       <div className='min-w prose flex w-full max-w-full flex-col items-center gap-2 p-2 text-center'>
         <h3 className='text-lg text-accent'>Form Penjualan</h3>
+
         <div className='w-full overflow-x-auto'>
           <table className='table'>
             <thead>
@@ -316,6 +362,7 @@ export default function SalesForm() {
         </div>
 
         {error && <PlatformAlert text={String(error)} type='error' />}
+        {printError && <PlatformAlert text={printError} type='error' />}
         <div className='mt-4 flex w-full justify-between gap-2'>
           <button
             className='btn btn-accent text-white'
@@ -343,6 +390,7 @@ export default function SalesForm() {
         isOpen={showReceiptModal}
         onClose={handleCloseModal}
         onPrintReceipt={handlePrintReceipt}
+        receiptData={receiptData}
       />
     </>
   );
