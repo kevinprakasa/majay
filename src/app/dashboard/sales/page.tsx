@@ -166,6 +166,7 @@ export default function SalesPage() {
                 <tr>
                   <th></th>
                   <th>Tanggal</th>
+                  <th>No. Nota</th>
                   <th>Nama barang</th>
                   <th>Kode barang</th>
                   <th>Jumlah barang terjual</th>
@@ -184,6 +185,12 @@ export default function SalesPage() {
                     <tr key={sale.id}>
                       <th>{index + 1}</th>
                       <td>{new Date(sale.createdAt).toLocaleString()}</td>
+
+                      <td>
+                        {sale.transactionNumber ||
+                          `TXN-${new Date(sale.createdAt).getTime().toString().slice(-8)}`}
+                        {/* Previous records doesn't have sales in it, so lets assume it's from the created at */}
+                      </td>
                       <td>{sku.name}</td>
                       <td>{sku.code}</td>
                       <td>{numberFormat(sale.quantity)}</td>

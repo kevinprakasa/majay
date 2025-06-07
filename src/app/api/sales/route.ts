@@ -65,6 +65,9 @@ export async function POST(request: NextRequest) {
     // Handle both single sale and multiple sales
     const salesData = Array.isArray(data) ? data : [data];
 
+    // Generate a single transaction number for this batch of sales
+    const transactionNumber = `TXN-${Date.now().toString().slice(-8)}`;
+
     const createdSales: InstanceType<typeof SaleModel>[] = [];
     const updatedSkus = new Map<
       string,
@@ -112,6 +115,7 @@ export async function POST(request: NextRequest) {
         priceUnit: Types.Decimal128.fromString(salesPriceUnit!.toString()),
         priceTotal: Types.Decimal128.fromString(salesPriceTotal!.toString()),
         profit: Types.Decimal128.fromString(profit.toString()),
+        transactionNumber,
         quantity,
       });
 

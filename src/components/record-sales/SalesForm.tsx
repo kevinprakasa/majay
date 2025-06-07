@@ -119,8 +119,13 @@ export default function SalesForm() {
       if (!res.ok) {
         throw new Error(`Error reason: ${await res.text()} `);
       }
+      return await res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Use transaction number from the first sale record (all sales in a batch share the same transactionNumber)
+      const transactionNumber =
+        data[0]?.transactionNumber || `TXN-${Date.now().toString().slice(-8)}`;
+
       // Prepare receipt data before clearing form items
       const receiptItems: ReceiptItem[] = formItems
         .filter((item) => item.id && item.name)
@@ -141,7 +146,7 @@ export default function SalesForm() {
         items: receiptItems,
         totalAmount,
         date: new Date(),
-        receiptNumber: `TXN-${Date.now().toString().slice(-8)}`,
+        receiptNumber: transactionNumber,
       });
 
       setShowReceiptModal(true);
@@ -279,7 +284,7 @@ export default function SalesForm() {
                             });
                           }}
                           value={formItem.quantity ?? ''}
-                          className='input input-sm input-bordered w-full min-w-[50px] max-w-16'
+                          className='input input-sm input-bordered w-full min-w-[65px] max-w-16'
                         />
                         {itemSku && (
                           <span className='text-xs'>

@@ -68,6 +68,7 @@ export interface Sale {
   priceUnit: string;
   priceTotal: string;
   profit: string;
+  transactionNumber: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -83,6 +84,7 @@ const saleSchema = new Schema({
   priceUnit: { type: Types.Decimal128, required: true },
   priceTotal: { type: Types.Decimal128, required: true },
   profit: { type: Types.Decimal128, required: true },
+  transactionNumber: { type: String, required: true, index: true },
   createdAt: { type: Date, default: Date.now, index: true }, // aka. Sale date
   updatedAt: { type: Date, default: Date.now },
 });
