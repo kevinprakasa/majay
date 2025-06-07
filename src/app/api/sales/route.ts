@@ -62,61 +62,92 @@ export async function POST(request: NextRequest) {
   await dbConnect();
 
   try {
-    const { id, ...saleData } = data as {
-      id: string;
-      quantity: number;
-      priceUnit?: number;
-      priceTotal?: number;
-    };
+    // Handle both single sale and multiple sales
+    const salesData = Array.isArray(data) ? data : [data];
 
-    // Validate saleData here
+    const createdSales: InstanceType<typeof SaleModel>[] = [];
+    const updatedSkus = new Map<
+      string,
+      { sku: InstanceType<typeof SKUModel>; updatedStock: number }
+    >();
 
-    const sku = await SKUModel.findById(id);
-    if (!sku) {
-      throw new Error('SKU not found');
+    // First pass: validate all sales and prepare data
+    for (const saleData of salesData) {
+      const { id, ...saleInfo } = saleData as {
+        id: string;
+        quantity: number;
+        priceUnit?: number;
+        priceTotal?: number;
+      };
+
+      const sku = await SKUModel.findById(id);
+      if (!sku) {
+        throw new Error(`SKU not found for id: ${id}`);
+      }
+
+      const { priceUnit, quantity, priceTotal } = saleInfo;
+      let salesPriceTotal = priceTotal;
+      let salesPriceUnit = priceUnit;
+      if (priceTotal === undefined && priceUnit) {
+        salesPriceTotal = priceUnit * quantity;
+      } else if (priceUnit === undefined && priceTotal) {
+        salesPriceUnit = priceTotal / quantity;
+      } else if (!priceUnit && !priceTotal) {
+        throw new Error('Price unit or price total are not provided');
+      }
+
+      if (quantity <= 0) {
+        throw new Error('Quantity must be greater than zero');
+      }
+
+      const updatedStock = sku.stock - quantity;
+      if (updatedStock < 0) {
+        throw new Error(`Stock not sufficient for SKU: ${sku.name}`);
+      }
+
+      const profit = salesPriceTotal! - Number(sku.capitalPrice) * quantity;
+
+      const sale = new SaleModel({
+        skuId: new Types.ObjectId(id),
+        priceUnit: Types.Decimal128.fromString(salesPriceUnit!.toString()),
+        priceTotal: Types.Decimal128.fromString(salesPriceTotal!.toString()),
+        profit: Types.Decimal128.fromString(profit.toString()),
+        quantity,
+      });
+
+      createdSales.push(sale);
+      updatedSkus.set(id, { sku, updatedStock });
     }
 
-    const { priceUnit, quantity, priceTotal } = saleData;
-    let salesPriceTotal = priceTotal;
-    let salesPriceUnit = priceUnit;
-    if (priceTotal === undefined && priceUnit) {
-      salesPriceTotal = priceUnit * quantity;
-    } else if (priceUnit === undefined && priceTotal) {
-      salesPriceUnit = priceTotal / quantity;
-    } else if (!priceUnit && !priceTotal) {
-      throw new Error('Price unit or price total are not provided');
+    // Second pass: save all sales and update SKUs
+    try {
+      // Save all sales
+      await SaleModel.insertMany(createdSales);
+
+      // Update all SKUs
+      for (const [id, { sku, updatedStock }] of Array.from(
+        updatedSkus.entries()
+      )) {
+        sku.stock = updatedStock;
+        await sku.save();
+      }
+    } catch (error) {
+      // If anything fails, we need to clean up any created sales
+      if (createdSales.length > 0) {
+        await SaleModel.deleteMany({
+          _id: { $in: createdSales.map((sale) => sale._id) },
+        });
+      }
+      throw error;
     }
 
-    if (quantity <= 0) {
-      throw new Error('Quantity must be greater than zero');
-    }
-
-    const updatedStock = sku.stock - quantity;
-    if (updatedStock < 0) {
-      throw new Error('Stock not sufficient');
-    }
-
-    const profit = salesPriceTotal! - Number(sku.capitalPrice) * quantity;
-
-    const sale = new SaleModel({
-      skuId: new Types.ObjectId(id),
-      priceUnit: Types.Decimal128.fromString(salesPriceUnit!.toString()),
-      priceTotal: Types.Decimal128.fromString(salesPriceTotal!.toString()),
-      profit: Types.Decimal128.fromString(profit.toString()),
-      quantity,
-    });
-    await sale.save();
-
-    sku.stock = updatedStock;
-    await sku.save();
-
-    return NextResponse.json(sale);
+    return NextResponse.json(createdSales);
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     } else {
       return NextResponse.json(
-        { error: 'Error recording sale' },
+        { error: 'Error recording sales' },
         { status: 500 }
       );
     }

@@ -1,52 +1,59 @@
 'use client';
 
 import { numberFormat, priceFormat } from '@/app/helper';
-import { PlusIcon } from '@heroicons/react/16/solid';
+import { PlusIcon, TrashIcon } from '@heroicons/react/16/solid';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { SKU, WithId } from 'models';
 import { useEffect, useState } from 'react';
 import { PlatformAlert } from '../PlatformAlert';
 
+type FormItem = {
+  code: string;
+  id?: string;
+  name?: string;
+  quantity?: number;
+  priceUnit?: number;
+  priceTotal?: number;
+};
+
 export default function SalesForm({ skuCode }: { skuCode: string }) {
-  const [skuCodeState, setSkuCodeState] = useState<string>(skuCode);
-  const [formState, setFormState] = useState<{
-    code: string;
-    id?: string;
-    name?: string;
-    quantity?: number;
-    priceUnit?: number;
-    priceTotal?: number;
-  }>({
-    code: '',
-  });
-  const { code, name, priceTotal, priceUnit, quantity, id } = formState;
+  const [skuCodeState, setSkuCodeState] = useState<string[]>([skuCode]);
+  const [formItems, setFormItems] = useState<FormItem[]>([{ code: '' }]);
 
   const { data: skuData } = useQuery({
-    queryKey: ['sku', skuCodeState],
+    queryKey: ['sku', skuCodeState[skuCodeState.length - 1]],
     queryFn: async () => {
-      if (!skuCodeState) return null;
-      const res = await fetch(`/api/sku?code=${skuCodeState}`);
+      const lastCode = skuCodeState[skuCodeState.length - 1];
+      if (!lastCode) return null;
+      const res = await fetch(`/api/sku?code=${lastCode}`);
       return await res.json();
     },
   });
   const currentSku = skuData?.data[0] as WithId<SKU> | undefined;
 
-  const handleKeyDown = (e: any) => {
+  const handleKeyDown = (e: any, index: number) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      setSkuCodeState(e.target.value);
+      const newSkuCodes = [...skuCodeState];
+      newSkuCodes[index] = e.target.value;
+      setSkuCodeState(newSkuCodes);
     }
   };
 
   useEffect(() => {
     if (currentSku) {
-      setFormState({
-        code: currentSku.code,
-        id: currentSku.id,
-        name: currentSku.name,
-        quantity: 1,
-        priceUnit: Number(currentSku.capitalPrice),
-        priceTotal: Number(currentSku.capitalPrice),
+      setFormItems((prev) => {
+        const newItems = [...prev];
+        const lastIndex = newItems.length - 1;
+        newItems[lastIndex] = {
+          code: currentSku.code,
+          id: currentSku.id,
+          name: currentSku.name,
+          quantity: 1,
+          priceUnit: Number(currentSku.capitalPrice),
+          priceTotal: Number(currentSku.capitalPrice),
+        };
+        return newItems;
       });
     }
   }, [currentSku]);
@@ -58,172 +65,222 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
     isSuccess,
   } = useMutation({
     mutationFn: async () => {
-      // Record the sales
+      const salesData = formItems
+        .filter((item) => item.id)
+        .map((item) => ({
+          id: item.id,
+          quantity: item.quantity,
+          priceUnit: item.priceUnit,
+          priceTotal: item.priceTotal,
+        }));
+
+      if (salesData.length === 0) {
+        throw new Error('No items to record');
+      }
+
       const res = await fetch('/api/sales', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formState),
+        body: JSON.stringify(salesData),
       });
       if (!res.ok) {
         throw new Error(`Error reason: ${await res.text()} `);
       }
     },
     onSuccess: () => {
-      setFormState({ code: '' });
-      setSkuCodeState('');
+      setFormItems([{ code: '' }]);
+      setSkuCodeState(['']);
     },
   });
 
-  useEffect(() => {
-    setFormState((prev) => ({
-      ...prev,
-      priceTotal: priceUnit ? priceUnit * (quantity || 1) : prev.priceTotal,
-    }));
-  }, [quantity, priceUnit]);
+  const updateFormItem = (index: number, updates: Partial<FormItem>) => {
+    setFormItems((prev) => {
+      const newItems = [...prev];
+      newItems[index] = { ...newItems[index], ...updates };
+      return newItems;
+    });
+  };
 
-  useEffect(() => {
-    setFormState((prev) => ({
-      ...prev,
-      priceUnit: priceTotal
-        ? Math.ceil(priceTotal / (prev.quantity || 1)) // just to prevent division issue
-        : prev.priceUnit,
-    }));
-  }, [priceTotal]);
+  const addNewItem = () => {
+    setFormItems((prev) => [...prev, { code: '' }]);
+    setSkuCodeState((prev) => [...prev, '']);
+  };
 
-  useEffect(() => {
-    setSkuCodeState(skuCode);
-  }, [skuCode]);
-
-  const isSkuAvailable = !!id;
+  const removeItem = (index: number) => {
+    setFormItems((prev) => prev.filter((_, i) => i !== index));
+    setSkuCodeState((prev) => prev.filter((_, i) => i !== index));
+  };
 
   return (
     <>
-      <div className='prose flex w-[400px] flex-col items-center gap-2 p-2 text-center '>
+      <div className='prose flex w-full max-w-full flex-col items-center gap-2 p-2 text-center'>
         <h3 className='text-lg text-accent'>Form Penjualan</h3>
-        <label className='form-control w-full max-w-xs'>
-          <div className='label'>
-            <span className='label-text font-semibold'>Kode barang:</span>
-          </div>
+        <div className='w-full overflow-x-auto'>
+          <table className='table'>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Kode Barang</th>
+                <th>Nama Barang</th>
+                <th>Jumlah</th>
+                <th>Harga Satuan</th>
+                <th>Harga Total</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {formItems.map((formItem, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>
+                    <div className='flex items-center gap-2'>
+                      <input
+                        type='text'
+                        className='input input-sm input-bordered w-full uppercase'
+                        value={formItem.code ?? ''}
+                        disabled={!!formItem.id}
+                        onChange={(e) =>
+                          updateFormItem(index, { code: e.target.value })
+                        }
+                        onKeyDown={(e) => handleKeyDown(e, index)}
+                        placeholder='e.g. PAKUW10....'
+                      />
+                      <div
+                        className='tooltip'
+                        data-tip='Tekan enter untuk input kode secara manual'
+                      >
+                        <kbd className='kbd kbd-sm'>&crarr;</kbd>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <input
+                      type='text'
+                      placeholder='e.g. Paku beton....'
+                      value={formItem.name ?? ''}
+                      disabled={true}
+                      className='input input-sm input-bordered w-full'
+                    />
+                  </td>
+                  <td>
+                    <div className='flex flex-col gap-1'>
+                      <input
+                        type='number'
+                        disabled={!formItem.id}
+                        placeholder='e.g. 10....'
+                        onChange={(e) => {
+                          const quantity = !e.target.value
+                            ? undefined
+                            : Number(e.target.value);
+                          updateFormItem(index, {
+                            quantity,
+                          });
+                        }}
+                        value={formItem.quantity ?? ''}
+                        className='input input-sm input-bordered w-full max-w-16'
+                      />
+                      {currentSku && index === formItems.length - 1 && (
+                        <span className='text-xs'>
+                          Stok: {numberFormat(currentSku.stock)}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <div className='flex flex-col gap-1'>
+                      <div className='input-group input-group-sm flex items-center gap-1'>
+                        <span>Rp</span>
+                        <input
+                          type='number'
+                          disabled={!formItem.id}
+                          value={formItem.priceUnit ?? ''}
+                          onChange={(e) => {
+                            const priceUnit = !e.target.value
+                              ? undefined
+                              : Number(e.target.value);
+                            updateFormItem(index, {
+                              priceUnit,
+                              priceTotal:
+                                priceUnit && formItem.quantity
+                                  ? priceUnit * formItem.quantity
+                                  : undefined,
+                            });
+                          }}
+                          className='input input-sm input-bordered w-full'
+                          placeholder='e.g. 1000....'
+                        />
+                      </div>
+                      {currentSku && index === formItems.length - 1 && (
+                        <span className='text-xs'>
+                          Modal: {priceFormat(currentSku.capitalPrice)}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <div className='input-group input-group-sm flex items-center gap-1'>
+                      <span>Rp</span>
+                      <input
+                        type='number'
+                        disabled={!formItem.id}
+                        onChange={(e) => {
+                          const priceTotal = !e.target.value
+                            ? undefined
+                            : Number(e.target.value);
+                          updateFormItem(index, {
+                            priceTotal,
+                            priceUnit:
+                              priceTotal && formItem.quantity
+                                ? priceTotal / formItem.quantity
+                                : undefined,
+                          });
+                        }}
+                        value={formItem.priceTotal ?? ''}
+                        className='input input-sm input-bordered w-full'
+                        placeholder='e.g. 10000....'
+                      />
+                    </div>
+                  </td>
+                  <td>
+                    {formItems.length > 1 && (
+                      <button
+                        className='btn btn-neutral btn-sm flex-nowrap'
+                        onClick={() => removeItem(index)}
+                      >
+                        <TrashIcon width={16} className='mr-1' />
+                        Hapus
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-          <label className='input input-bordered flex items-center gap-2'>
-            <input
-              type='text'
-              className='grow uppercase'
-              value={code ?? ''}
-              disabled={!!isSkuAvailable}
-              onChange={(e) =>
-                setFormState({ ...formState, code: e.target.value })
-              }
-              onKeyDown={handleKeyDown}
-              placeholder='e.g. PAKUW10....'
-            />
-            <div
-              className='tooltip'
-              data-tip='Tekan enter untuk input kode secara manual'
-            >
-              <kbd className='kbd kbd-sm '>&crarr;</kbd>
-            </div>
-          </label>
-        </label>
-        <label className='form-control w-full max-w-xs'>
-          <div className='label'>
-            <span className='label-text font-semibold'>Nama barang:</span>
-          </div>
-          <input
-            type='text'
-            placeholder='e.g. Paku beton....'
-            value={name ?? ''}
-            disabled={true}
-            className='input input-bordered w-full max-w-xs'
-          />
-        </label>
-        <label className='form-control w-full max-w-xs'>
-          <div className='label'>
-            <span className='label-text font-semibold'>
-              Jumlah barang terjual:
-            </span>
-            {currentSku && (
-              <span className='font-semibold-alt label-text'>
-                Jumlah stok: {numberFormat(currentSku.stock)}
-              </span>
-            )}
-          </div>
-          <input
-            type='number'
-            disabled={!isSkuAvailable}
-            placeholder='e.g. 10....'
-            onChange={(e) => {
-              setFormState({
-                ...formState,
-                quantity: !e.target.value ? undefined : Number(e.target.value),
-              });
-            }}
-            value={quantity ?? ''}
-            className='input input-bordered w-full max-w-xs'
-          />
-        </label>
-        <label className='form-control w-full max-w-xs'>
-          <div className='label'>
-            <span className='label-text font-semibold'>Harga jual:</span>
-            {currentSku && (
-              <span className='font-semibold-alt label-text'>
-                Harga modal: {priceFormat(currentSku.capitalPrice)}
-              </span>
-            )}
-          </div>
-          <label className='input input-bordered flex items-center gap-2'>
-            Rp.
-            <input
-              type='number'
-              disabled={!isSkuAvailable}
-              value={priceUnit ?? ''}
-              onChange={(e) => {
-                setFormState({
-                  ...formState,
-                  priceUnit: !e.target.value
-                    ? undefined
-                    : Number(e.target.value),
-                });
-              }}
-              className='input w-full max-w-xs border-none'
-              placeholder='e.g. 1000....'
-            />
-            /pcs
-          </label>
-          <div className='divider text-xs'>Input salah satu</div>
-          <label className='input input-bordered flex items-center gap-2'>
-            Rp.
-            <input
-              type='number'
-              disabled={!isSkuAvailable}
-              onChange={(e) => {
-                setFormState({
-                  ...formState,
-                  priceTotal: !e.target.value
-                    ? undefined
-                    : Number(e.target.value),
-                });
-              }}
-              value={priceTotal ?? ''}
-              className='input w-full max-w-xs border-none'
-              placeholder='e.g. 10000....'
-            />
-            total
-          </label>
-        </label>
         {error && <PlatformAlert text={String(error)} type='error' />}
-        <button
-          className='btn btn-primary mt-4 '
-          onClick={() => {
-            recordSales();
-          }}
-        >
-          {isPending && <span className='loading loading-spinner'></span>}
-          <PlusIcon width={16} />
-          Simpan
-        </button>
+        <div className='mt-4 flex gap-2'>
+          <button
+            className='btn btn-secondary'
+            onClick={addNewItem}
+            disabled={!formItems[formItems.length - 1].id}
+          >
+            Tambah barang
+          </button>
+          <button
+            className='btn btn-primary'
+            onClick={() => {
+              recordSales();
+            }}
+            disabled={!formItems.some((item) => item.id)}
+          >
+            {isPending && <span className='loading loading-spinner'></span>}
+            <PlusIcon width={16} />
+            Simpan penjualan
+          </button>
+        </div>
         {isSuccess && (
           <PlatformAlert text={'Penjualan telah disimpan'} type='success' />
         )}

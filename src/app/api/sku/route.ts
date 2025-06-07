@@ -11,15 +11,17 @@ export async function GET(request: NextRequest) {
       id: data.get('id') || undefined,
       name: data.get('name') || undefined,
       code: data.get('code') || undefined,
+      codeRegex: data.get('codeRegex') || undefined,
       page: Number(data.get('page')) || 1,
       limit: Number(data.get('limit')) || 10,
     };
-    const { id, name, code, page, limit } = filterData;
+    const { id, name, code, codeRegex, page, limit } = filterData;
 
     const query = {
       ...(id ? { _id: id } : {}),
       ...(name ? { name: { $regex: name, $options: 'i' } } : {}),
-      ...(code ? { code: { $regex: code, $options: 'i' } } : {}),
+      ...(code ? { code: code } : {}),
+      ...(codeRegex ? { code: { $regex: codeRegex, $options: 'i' } } : {}),
     };
 
     await dbConnect();
