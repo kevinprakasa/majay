@@ -12,6 +12,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { SKU, WithId } from 'models';
 import { useEffect, useState } from 'react';
 import { PlatformAlert } from '../PlatformAlert';
+import QRCodeScanner from '../QRCodeScanner';
 
 type FormItem = {
   code: string;
@@ -187,9 +188,11 @@ export default function SalesForm() {
                           </button>
                         </div>
                         <div className='tooltip' data-tip='Scan QR code'>
-                          <button className='btn btn-ghost btn-sm'>
-                            <QrCodeIcon width={16} />
-                          </button>
+                          <QRCodeScanner
+                            onScanned={(code) => {
+                              updateFormItem(index, { code });
+                            }}
+                          />
                         </div>
                       </div>
                     </td>
