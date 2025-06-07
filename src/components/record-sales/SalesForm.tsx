@@ -13,6 +13,7 @@ import { SKU, WithId } from 'models';
 import { useEffect, useState } from 'react';
 import { PlatformAlert } from '../PlatformAlert';
 import QRCodeScanner from '../QRCodeScanner';
+import ReceiptModal from './ReceiptModal';
 
 type FormItem = {
   code: string;
@@ -27,6 +28,7 @@ export default function SalesForm() {
   const [skuCodeState, setSkuCodeState] = useState<string[]>(['']);
   const [formItems, setFormItems] = useState<FormItem[]>([{ code: '' }]);
   const [loadedSkus, setLoadedSkus] = useState<WithId<SKU>[]>([]);
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
 
   const { data: skuData } = useQuery({
     queryKey: ['sku', skuCodeState[skuCodeState.length - 1]],
@@ -112,6 +114,7 @@ export default function SalesForm() {
       }
     },
     onSuccess: () => {
+      setShowReceiptModal(true);
       setFormItems([{ code: '' }]);
       setSkuCodeState(['']);
       setLoadedSkus([]);
@@ -134,6 +137,16 @@ export default function SalesForm() {
   const removeItem = (index: number) => {
     setFormItems((prev) => prev.filter((_, i) => i !== index));
     setSkuCodeState((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleCloseModal = () => {
+    setShowReceiptModal(false);
+  };
+
+  const handlePrintReceipt = () => {
+    // TODO: Implement receipt printing logic
+    console.log('Print receipt functionality will be implemented here');
+    setShowReceiptModal(false);
   };
 
   return (
@@ -305,7 +318,7 @@ export default function SalesForm() {
         {error && <PlatformAlert text={String(error)} type='error' />}
         <div className='mt-4 flex w-full justify-between gap-2'>
           <button
-            className='btn btn-secondary'
+            className='btn btn-accent text-white'
             onClick={addNewItem}
             disabled={!formItems[formItems.length - 1].id}
           >
@@ -324,10 +337,13 @@ export default function SalesForm() {
             Simpan penjualan
           </button>
         </div>
-        {isSuccess && (
-          <PlatformAlert text={'Penjualan telah disimpan'} type='success' />
-        )}
       </div>
+
+      <ReceiptModal
+        isOpen={showReceiptModal}
+        onClose={handleCloseModal}
+        onPrintReceipt={handlePrintReceipt}
+      />
     </>
   );
 }
