@@ -1,7 +1,13 @@
 'use client';
 
 import { numberFormat, priceFormat } from '@/app/helper';
-import { PlusIcon, TrashIcon } from '@heroicons/react/16/solid';
+import {
+  PlusIcon,
+  TrashIcon,
+  CheckIcon,
+  QrCodeIcon,
+  ArrowDownLeftIcon,
+} from '@heroicons/react/16/solid';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { SKU, WithId } from 'models';
 import { useEffect, useState } from 'react';
@@ -16,9 +22,10 @@ type FormItem = {
   priceTotal?: number;
 };
 
-export default function SalesForm({ skuCode }: { skuCode: string }) {
-  const [skuCodeState, setSkuCodeState] = useState<string[]>([skuCode]);
+export default function SalesForm() {
+  const [skuCodeState, setSkuCodeState] = useState<string[]>(['']);
   const [formItems, setFormItems] = useState<FormItem[]>([{ code: '' }]);
+  const [loadedSkus, setLoadedSkus] = useState<WithId<SKU>[]>([]);
 
   const { data: skuData } = useQuery({
     queryKey: ['sku', skuCodeState[skuCodeState.length - 1]],
@@ -31,6 +38,11 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
   });
   const currentSku = skuData?.data[0] as WithId<SKU> | undefined;
 
+  // Function to get SKU for a specific form item
+  const getSkuForItem = (itemId?: string): WithId<SKU> | undefined => {
+    return loadedSkus.find((sku) => sku.id === itemId);
+  };
+
   const handleKeyDown = (e: any, index: number) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -42,6 +54,15 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
 
   useEffect(() => {
     if (currentSku) {
+      // Add to loaded SKUs if not already present
+      setLoadedSkus((prev) => {
+        const exists = prev.some((sku) => sku.id === currentSku.id);
+        if (!exists) {
+          return [...prev, currentSku];
+        }
+        return prev;
+      });
+
       setFormItems((prev) => {
         const newItems = [...prev];
         const lastIndex = newItems.length - 1;
@@ -92,10 +113,11 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
     onSuccess: () => {
       setFormItems([{ code: '' }]);
       setSkuCodeState(['']);
+      setLoadedSkus([]);
     },
   });
 
-  const updateFormItem = (index: number, updates: Partial<FormItem>) => {
+  const updateFormItem = (index: number, updates: Partial<FormItem>) =r> {
     setFormItems((prev) => {
       const newItems = [...prev];
       newItems[index] = { ...newItems[index], ...updates };
@@ -115,7 +137,7 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
 
   return (
     <>
-      <div className='prose flex w-full max-w-full flex-col items-center gap-2 p-2 text-center'>
+      <div className='min-w prose flex w-full max-w-full flex-col items-center gap-2 p-2 text-center'>
         <h3 className='text-lg text-accent'>Form Penjualan</h3>
         <div className='w-full overflow-x-auto'>
           <table className='table'>
@@ -131,142 +153,160 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
               </tr>
             </thead>
             <tbody>
-              {formItems.map((formItem, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>
-                    <div className='flex items-center gap-2'>
+              {formItems.map((formItem, index) => {
+                const itemSku = getSkuForItem(formItem.id);
+                return (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>
+                      <div className='flex items-center gap-2'>
+                        <input
+                          type='text'
+                          className='input input-sm input-bordered w-full min-w-[150px] uppercase'
+                          value={formItem.code ?? ''}
+                          disabled={!!formItem.id}
+                          onChange={(e) =>
+                            updateFormItem(index, { code: e.target.value })
+                          }
+                          onKeyDown={(e) => handleKeyDown(e, index)}
+                          placeholder='e.g. PAKUW10....'
+                        />
+                        <div
+                          className='tooltip'
+                          data-tip='Tekan tombol ini atau tombol enter untuk input kode secara manual'
+                        >
+                          <button
+                            className='btn btn-ghost btn-sm'
+                            onClick={() => {
+                              const newSkuCodes = [...skuCodeState];
+                              newSkuCodes[index] = formItem.code ?? '';
+                              setSkuCodeState(newSkuCodes);
+                            }}
+                          >
+                            <ArrowDownLeftIcon width={16} />
+                          </button>
+                        </div>
+                        <div className='tooltip' data-tip='Scan QR code'>
+                          <button className='btn btn-ghost btn-sm'>
+                            <QrCodeIcon width={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
                       <input
                         type='text'
-                        className='input input-sm input-bordered w-full uppercase'
-                        value={formItem.code ?? ''}
-                        disabled={!!formItem.id}
-                        onChange={(e) =>
-                          updateFormItem(index, { code: e.target.value })
-                        }
-                        onKeyDown={(e) => handleKeyDown(e, index)}
-                        placeholder='e.g. PAKUW10....'
+                        placeholder='e.g. Paku beton....'
+                        value={formItem.name ?? ''}
+                        disabled={true}
+                        className='input input-sm input-bordered w-full min-w-[200px]'
                       />
-                      <div
-                        className='tooltip'
-                        data-tip='Tekan enter untuk input kode secara manual'
-                      >
-                        <kbd className='kbd kbd-sm'>&crarr;</kbd>
+                    </td>
+                    <td>
+                      <div className='flex flex-col gap-1'>
+                        <input
+                          type='number'
+                          disabled={!formItem.id}
+                          placeholder='e.g. 10....'
+                          onChange={(e) => {
+                            const quantity = !e.target.value
+                              ? undefined
+                              : Number(e.target.value);
+                            updateFormItem(index, {
+                              quantity,
+                            });
+                          }}
+                          value={formItem.quantity ?? ''}
+                          className='input input-sm input-bordered w-full min-w-[50px] max-w-16'
+                        />
+                        {itemSku && (
+                          <span className='text-xs'>
+                            Stok: {numberFormat(itemSku.stock)}
+                          </span>
+                        )}
                       </div>
-                    </div>
-                  </td>
-                  <td>
-                    <input
-                      type='text'
-                      placeholder='e.g. Paku beton....'
-                      value={formItem.name ?? ''}
-                      disabled={true}
-                      className='input input-sm input-bordered w-full'
-                    />
-                  </td>
-                  <td>
-                    <div className='flex flex-col gap-1'>
-                      <input
-                        type='number'
-                        disabled={!formItem.id}
-                        placeholder='e.g. 10....'
-                        onChange={(e) => {
-                          const quantity = !e.target.value
-                            ? undefined
-                            : Number(e.target.value);
-                          updateFormItem(index, {
-                            quantity,
-                          });
-                        }}
-                        value={formItem.quantity ?? ''}
-                        className='input input-sm input-bordered w-full max-w-16'
-                      />
-                      {currentSku && index === formItems.length - 1 && (
-                        <span className='text-xs'>
-                          Stok: {numberFormat(currentSku.stock)}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className='flex flex-col gap-1'>
-                      <div className='input-group input-group-sm flex items-center gap-1'>
+                    </td>
+                    <td>
+                      <div className='flex flex-col gap-1'>
+                        <div className='input-group input-group-sm flex min-w-[130px] items-center gap-1'>
+                          <span>Rp</span>
+                          <input
+                            type='number'
+                            disabled={!formItem.id}
+                            value={formItem.priceUnit ?? ''}
+                            onChange={(e) => {
+                              const priceUnit = !e.target.value
+                                ? undefined
+                                : Number(e.target.value);
+                              updateFormItem(index, {
+                                priceUnit,
+                                priceTotal:
+                                  priceUnit && formItem.quantity
+                                    ? priceUnit * formItem.quantity
+                                    : undefined,
+                              });
+                            }}
+                            className='input input-sm input-bordered w-full'
+                            placeholder='e.g. 1000....'
+                          />
+                        </div>
+                        {itemSku && (
+                          <span className='text-xs'>
+                            Modal: {priceFormat(itemSku.capitalPrice)}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <div className='input-group input-group-sm flex min-w-[130px] items-center gap-1'>
                         <span>Rp</span>
                         <input
                           type='number'
                           disabled={!formItem.id}
-                          value={formItem.priceUnit ?? ''}
                           onChange={(e) => {
-                            const priceUnit = !e.target.value
+                            const priceTotal = !e.target.value
                               ? undefined
                               : Number(e.target.value);
                             updateFormItem(index, {
-                              priceUnit,
-                              priceTotal:
-                                priceUnit && formItem.quantity
-                                  ? priceUnit * formItem.quantity
+                              priceTotal,
+                              priceUnit:
+                                priceTotal && formItem.quantity
+                                  ? priceTotal / formItem.quantity
                                   : undefined,
                             });
                           }}
+                          value={formItem.priceTotal ?? ''}
                           className='input input-sm input-bordered w-full'
-                          placeholder='e.g. 1000....'
+                          placeholder='e.g. 10000....'
                         />
                       </div>
-                      {currentSku && index === formItems.length - 1 && (
-                        <span className='text-xs'>
-                          Modal: {priceFormat(currentSku.capitalPrice)}
-                        </span>
+                    </td>
+                    <td>
+                      {formItems.length > 1 && (
+                        <button
+                          className='btn btn-neutral btn-sm flex-nowrap'
+                          onClick={() => removeItem(index)}
+                        >
+                          <TrashIcon width={16} className='mr-1' />
+                          Hapus
+                        </button>
                       )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className='input-group input-group-sm flex items-center gap-1'>
-                      <span>Rp</span>
-                      <input
-                        type='number'
-                        disabled={!formItem.id}
-                        onChange={(e) => {
-                          const priceTotal = !e.target.value
-                            ? undefined
-                            : Number(e.target.value);
-                          updateFormItem(index, {
-                            priceTotal,
-                            priceUnit:
-                              priceTotal && formItem.quantity
-                                ? priceTotal / formItem.quantity
-                                : undefined,
-                          });
-                        }}
-                        value={formItem.priceTotal ?? ''}
-                        className='input input-sm input-bordered w-full'
-                        placeholder='e.g. 10000....'
-                      />
-                    </div>
-                  </td>
-                  <td>
-                    {formItems.length > 1 && (
-                      <button
-                        className='btn btn-neutral btn-sm flex-nowrap'
-                        onClick={() => removeItem(index)}
-                      >
-                        <TrashIcon width={16} className='mr-1' />
-                        Hapus
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
 
         {error && <PlatformAlert text={String(error)} type='error' />}
-        <div className='mt-4 flex gap-2'>
+        <div className='mt-4 flex w-full justify-between gap-2'>
           <button
             className='btn btn-secondary'
             onClick={addNewItem}
             disabled={!formItems[formItems.length - 1].id}
           >
+            <PlusIcon width={16} />
             Tambah barang
           </button>
           <button
@@ -277,7 +317,7 @@ export default function SalesForm({ skuCode }: { skuCode: string }) {
             disabled={!formItems.some((item) => item.id)}
           >
             {isPending && <span className='loading loading-spinner'></span>}
-            <PlusIcon width={16} />
+            <CheckIcon width={16} />
             Simpan penjualan
           </button>
         </div>
