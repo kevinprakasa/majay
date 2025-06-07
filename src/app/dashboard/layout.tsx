@@ -45,7 +45,7 @@ export default function DashboardLayout({
               className={`${pathname.startsWith('/dashboard/sku') && 'active'}`}
             >
               <ListBulletIcon width={16} />
-              List barang
+              List Barang
             </Link>
           </li>
           <li>
@@ -71,7 +71,7 @@ export default function DashboardLayout({
               className={`${pathname.startsWith('/dashboard/sales') && 'active'}`}
             >
               <BuildingStorefrontIcon width={16} />
-              Dashboard penjualan
+              Dashboard Penjualan
             </Link>
           </li>
         </ul>

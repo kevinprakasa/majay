@@ -89,7 +89,7 @@ export default function SalesPage() {
         }}
       />
       <span className='prose'>
-        <h2 className='text-accent'>Dashboard penjualan</h2>
+        <h2 className='text-accent'>Dashboard Penjualan</h2>
       </span>
       <div className='mt-6 flex w-full flex-col gap-4'>
         <div className='flex flex-col gap-4 md:flex-row'>

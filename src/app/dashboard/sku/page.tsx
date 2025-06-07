@@ -12,7 +12,7 @@ export default function SKUPage() {
     <>
       <div className='mb-6 w-full text-left'>
         <span className='prose'>
-          <h2 className='text-accent'>List barang</h2>
+          <h2 className='text-accent'>List Barang</h2>
         </span>
       </div>
       <div className='flex w-full flex-col gap-4'>

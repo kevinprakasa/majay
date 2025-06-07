@@ -201,8 +201,8 @@ export default function SalesForm() {
 
   return (
     <>
-      <div className='min-w prose flex w-full max-w-full flex-col items-center gap-2 p-2 text-center'>
-        <h3 className='text-lg text-accent'>Form Penjualan</h3>
+      <div className='min-w prose flex w-full max-w-full flex-col gap-2 p-2'>
+        <h2 className='mb-0 text-left text-accent'>Input Penjualan</h2>
 
         <div className='w-full overflow-x-auto'>
           <table className='table'>
@@ -234,7 +234,7 @@ export default function SalesForm() {
                             updateFormItem(index, { code: e.target.value })
                           }
                           onKeyDown={(e) => handleKeyDown(e, index)}
-                          placeholder='e.g. PAKUW10....'
+                          placeholder='PAKUW10....'
                         />
                         <div
                           className='tooltip'
@@ -263,7 +263,7 @@ export default function SalesForm() {
                     <td>
                       <input
                         type='text'
-                        placeholder='e.g. Paku beton....'
+                        placeholder='Paku beton....'
                         value={formItem.name ?? ''}
                         disabled={true}
                         className='input input-sm input-bordered w-full min-w-[200px]'
@@ -274,7 +274,7 @@ export default function SalesForm() {
                         <input
                           type='number'
                           disabled={!formItem.id}
-                          placeholder='e.g. 10....'
+                          placeholder='10....'
                           onChange={(e) => {
                             const quantity = !e.target.value
                               ? undefined
@@ -314,7 +314,7 @@ export default function SalesForm() {
                               });
                             }}
                             className='input input-sm input-bordered w-full'
-                            placeholder='e.g. 1000....'
+                            placeholder='1000....'
                           />
                         </div>
                         {itemSku && (
@@ -344,7 +344,7 @@ export default function SalesForm() {
                           }}
                           value={formItem.priceTotal ?? ''}
                           className='input input-sm input-bordered w-full'
-                          placeholder='e.g. 10000....'
+                          placeholder='10000....'
                         />
                       </div>
                     </td>
