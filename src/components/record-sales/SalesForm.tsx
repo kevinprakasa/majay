@@ -117,7 +117,7 @@ export default function SalesForm() {
     },
   });
 
-  const updateFormItem = (index: number, updates: Partial<FormItem>) =r> {
+  const updateFormItem = (index: number, updates: Partial<FormItem>) => {
     setFormItems((prev) => {
       const newItems = [...prev];
       newItems[index] = { ...newItems[index], ...updates };
